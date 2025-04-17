@@ -2,12 +2,23 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, Pressable, Dimensions, Image } from 'react-native';
 import { Heart } from 'lucide-react-native';
 import Colors from '@/constants/colors';
-import { Property } from '@/mocks/properties';
+import { InstaQLEntity } from '@instantdb/react-native';
+import { AppSchema } from '@/instant.schema';
 import Rating from './Rating';
 
+type ListingWithDetails = InstaQLEntity<
+  AppSchema,
+  'listings',
+  {
+    images: {};
+    location: {};
+    pricing: {};
+  }
+>;
+
 interface PropertyCardProps {
-  property: Property;
-  onPress: (property: Property) => void;
+  property: ListingWithDetails;
+  onPress: (property: ListingWithDetails) => void;
 }
 
 const { width } = Dimensions.get('window');
@@ -16,16 +27,20 @@ const cardWidth = width / 2 - 24; // 2 columns with padding
 const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
+  const images = property.images || [];
+  const hasImages = images.length > 0;
 
   const handleNextImage = () => {
-    setCurrentImageIndex((prevIndex) => 
-      prevIndex === property.images.length - 1 ? 0 : prevIndex + 1
+    if (!hasImages) return;
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1
     );
   };
 
   const handlePrevImage = () => {
-    setCurrentImageIndex((prevIndex) => 
-      prevIndex === 0 ? property.images.length - 1 : prevIndex - 1
+    if (!hasImages) return;
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
     );
   };
 
@@ -34,17 +49,30 @@ const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
     setIsFavorite(!isFavorite);
   };
 
+  const locationString = property.location
+    ? `${property.location.city}, ${property.location.state}`
+    : 'Location unavailable';
+  const basePrice = property.pricing?.basePrice;
+
+  const currentImageUrl = hasImages ? images[currentImageIndex]?.url : undefined;
+
   return (
     <Pressable 
       style={styles.container}
       onPress={() => onPress(property)}
     >
       <View style={styles.imageContainer}>
-        <Image 
-          source={{ uri: property.images[currentImageIndex] }}
-          style={styles.image}
-          resizeMode="cover"
-        />
+        {currentImageUrl ? (
+          <Image 
+            source={{ uri: currentImageUrl }}
+            style={styles.image}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={[styles.image, styles.placeholderImage]}>
+            <Text style={styles.placeholderText}>No Image</Text>
+          </View>
+        )}
         
         <Pressable 
           style={styles.favoriteButton}
@@ -57,43 +85,43 @@ const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
           />
         </Pressable>
         
-        <View style={styles.imageNavigation}>
-          {property.images.map((_, index) => (
-            <View 
-              key={index} 
-              style={[
-                styles.dot, 
-                index === currentImageIndex && styles.activeDot
-              ]} 
-            />
-          ))}
-        </View>
-        
-        {property.superhost && (
-          <View style={styles.superhostBadge}>
-            <Text style={styles.superhostText}>Superhost</Text>
+        {hasImages && images.length > 1 && (
+          <View style={styles.imageNavigation}>
+            {images.map((_, index) => (
+              <View 
+                key={index} 
+                style={[
+                  styles.dot, 
+                  index === currentImageIndex && styles.activeDot
+                ]} 
+              />
+            ))}
           </View>
         )}
         
-        <Pressable 
-          style={[styles.navButton, styles.prevButton]} 
-          onPress={handlePrevImage}
-        >
-          <Text style={styles.navButtonText}>‹</Text>
-        </Pressable>
-        
-        <Pressable 
-          style={[styles.navButton, styles.nextButton]} 
-          onPress={handleNextImage}
-        >
-          <Text style={styles.navButtonText}>›</Text>
-        </Pressable>
+        {hasImages && images.length > 1 && (
+          <>
+            <Pressable 
+              style={[styles.navButton, styles.prevButton]} 
+              onPress={handlePrevImage}
+            >
+              <Text style={styles.navButtonText}>‹</Text>
+            </Pressable>
+            
+            <Pressable 
+              style={[styles.navButton, styles.nextButton]} 
+              onPress={handleNextImage}
+            >
+              <Text style={styles.navButtonText}>›</Text>
+            </Pressable>
+          </>
+        )}
       </View>
       
       <View style={styles.infoContainer}>
         <View style={styles.titleRow}>
           <Text style={styles.location} numberOfLines={1}>
-            {property.location}
+            {locationString}
           </Text>
           <Rating rating={property.rating} size="small" showReviewCount={false} />
         </View>
@@ -102,20 +130,16 @@ const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
           {property.title}
         </Text>
         
-        <Text style={styles.distance}>
-          {property.distance}
-        </Text>
-        
-        <Text style={styles.dates}>
-          {property.dates}
-        </Text>
-        
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>
-            ${property.price}
-          </Text>
-          <Text style={styles.night}> night</Text>
-        </View>
+        {basePrice !== undefined ? (
+          <View style={styles.priceContainer}>
+            <Text style={styles.price}>
+              ${basePrice}
+            </Text>
+            <Text style={styles.night}> night</Text>
+          </View>
+        ) : (
+          <Text style={styles.priceUnavailable}>Price unavailable</Text>
+        )}
       </View>
     </Pressable>
   );
@@ -166,20 +190,6 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
   },
-  superhostBadge: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  superhostText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
   navButton: {
     position: 'absolute',
     top: '50%',
@@ -224,16 +234,6 @@ const styles = StyleSheet.create({
     color: Colors.light.lightText,
     marginBottom: 4,
   },
-  distance: {
-    fontSize: 14,
-    color: Colors.light.lightText,
-    marginBottom: 2,
-  },
-  dates: {
-    fontSize: 14,
-    color: Colors.light.lightText,
-    marginBottom: 4,
-  },
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -246,6 +246,20 @@ const styles = StyleSheet.create({
   night: {
     fontSize: 14,
     color: Colors.light.text,
+  },
+  placeholderImage: {
+    backgroundColor: Colors.light.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderText: {
+    color: Colors.light.lightText,
+    fontSize: 16,
+  },
+  priceUnavailable: {
+    fontSize: 14,
+    color: Colors.light.lightText,
+    marginTop: 4,
   },
 });
 

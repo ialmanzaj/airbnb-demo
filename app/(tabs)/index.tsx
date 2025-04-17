@@ -5,35 +5,56 @@ import { Stack } from 'expo-router';
 import { Sliders } from 'lucide-react-native';
 
 import Colors from '@/constants/colors';
-import { properties } from '@/mocks/properties';
 import SearchBar from '@/components/home/SearchBar';
 import FilterBar from '@/components/home/FilterBar';
 import PropertyCard from '@/components/home/PropertyCard';
-import { init } from '@instantdb/react-native';
-import { schema, Property } from '@/mocks/schemas';
+import { init, InstaQLEntity } from '@instantdb/react-native';
+import schema, { AppSchema } from "@/instant.schema";
 import { LegendList } from '@legendapp/list';
 
+
 // ID for app: airbnb-demo
-const APP_ID = process.env.EXPO_PUBLIC_INSTANTDB_APP_ID!;
-console.log(APP_ID);
+const APP_ID = process.env.EXPO_PUBLIC_INSTANT_APP_ID!;
 
 const db = init({ appId: APP_ID, schema });
 
+// Define the query type for type safety and utility type extraction
+const listingsQuery = {
+  listings: {
+    images: {},
+    location: {},
+    pricing: {},
+  },
+}; // Add satisfies for type checking
+
+// Define the type for a single listing based on the query
+type ListingWithDetails = InstaQLEntity<
+  AppSchema,
+  'listings',
+  typeof listingsQuery['listings']
+>;
 
 export default function HomeScreen() {
   const [showFilters, setShowFilters] = useState(false);
 
-  const { isLoading, error, data } = db.useQuery({ properties: {} });
-  console.log(data);
+  // Use the defined query
+  const { isLoading, error, data } = db.useQuery(listingsQuery);
 
-  const handlePropertyPress = (property: Property) => {
+  // Use the correct type
+  const listings: ListingWithDetails[] = data?.listings || [];
+  console.log("listings", listings);
+
+  // Update the type for the pressed item
+  const handlePropertyPress = (listing: ListingWithDetails) => {
     Alert.alert(
-      property.title,
-      `You selected ${property.title} in ${property.location}. This would navigate to a property details screen.`
+      listing.title,
+      // Adjust alert message if needed, location is now nested
+      `You selected ${listing.title} in ${listing.location?.city}. This would navigate to a property details screen.`
     );
   };
 
-  const renderItem = ({ item }: { item: Property }) => (
+  // Update the item type in renderItem
+  const renderItem = ({ item }: { item: ListingWithDetails }) => (
     <PropertyCard
       property={item}
       onPress={handlePropertyPress}
@@ -41,7 +62,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={[ 'top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <Stack.Screen
         options={{
           headerShown: false,
@@ -54,7 +75,7 @@ export default function HomeScreen() {
       <View style={styles.listContainer}>
         <View style={styles.listHeader}>
           <Text style={styles.resultsText}>
-            {properties.length} homes
+            {listings?.length} homes
           </Text>
 
           <Pressable
@@ -68,11 +89,11 @@ export default function HomeScreen() {
 
         <LegendList
           estimatedItemSize={200}
-          data={properties}
+          data={listings}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           numColumns={2}
-          columnWrapperStyle={styles.columnWrapper}
+          columnWrapperStyle={styles.columnWrapper as any}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
           recycleItems
