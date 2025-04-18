@@ -1,0 +1,101 @@
+---
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+ # Tailwind Styling Pattern
+
+## Context
+- When creating or modifying React Native components
+- When converting StyleSheet styles to Tailwind classes
+- When organizing component styles
+
+## Requirements
+- Define styles object at the bottom of the component file
+- Use semantic naming for style keys that describe their purpose
+- Group related styles together in the styles object
+- Use Tailwind classes for all styling instead of StyleSheet
+- Convert all style props to className props
+- Use direct className strings for simple, one-off styles
+- Follow mobile-first responsive design patterns
+- Maintain consistent spacing and color scales across components
+
+## Examples
+
+<example>
+```tsx
+// ✅ Good: Organized styles object with semantic names
+const styles = {
+  container: 'flex-1 bg-white px-4 py-2',
+  header: 'flex-row justify-between items-center',
+  title: 'text-lg font-medium text-gray-900',
+  actionButton: 'flex-row items-center rounded-full px-3 py-1.5',
+};
+
+export function MyComponent() {
+  return (
+    <View className={styles.container}>
+      <View className={styles.header}>
+        <Text className={styles.title}>Title</Text>
+        <Pressable className={styles.actionButton}>
+          <Text>Action</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+```
+</example>
+
+<example type="invalid">
+```tsx
+// ❌ Bad: Mixed styling approaches and inline styles
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+});
+
+export function MyComponent() {
+  return (
+    <View style={styles.container}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Text className="text-lg">Title</Text>
+        <Pressable style={styles.button}>
+          <Text>Action</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+```
+</example>
+
+## Style Organization Pattern
+
+1. Layout styles (flex, padding, margin)
+2. Visual styles (background, border)
+3. Typography styles (text size, weight, color)
+4. Interactive styles (hover, active states)
+
+## Common Style Groups
+
+```tsx
+const styles = {
+  // Layout
+  container: 'flex-1 px-4 py-2',
+  row: 'flex-row items-center',
+  
+  // Content
+  header: 'justify-between py-4',
+  section: 'space-y-2',
+  
+  // Typography
+  title: 'text-xl font-bold text-gray-900',
+  body: 'text-base text-gray-700',
+  
+  // Interactive
+  button: 'flex-row items-center rounded-full px-3 py-1.5',
+  pressable: 'active:opacity-70'
+};
