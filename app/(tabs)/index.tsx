@@ -102,6 +102,7 @@ export default function HomeScreen() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
+      
       <FilterBar />
 
       <View className={styles.listContainer}>
