@@ -2,7 +2,7 @@ import React from 'react';
 import { fireEvent } from '@testing-library/react-native';
 import { render } from '../utils/test-utils';
 import PropertyCard, { Property } from '@/components/home/PropertyCard';
-import Colors from '@/constants/colors';
+
 
 // Mock colors constant
 jest.mock('@/constants/colors', () => ({

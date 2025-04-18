@@ -1,7 +1,7 @@
 import React from 'react';
+import SearchBar from '@/components/home/SearchBar';
 import { fireEvent } from '@testing-library/react-native';
 import { render } from '../utils/test-utils';
-import SearchBar from '../../components/home/SearchBar';
 
 // Mock colors constant
 jest.mock('@/constants/colors', () => ({

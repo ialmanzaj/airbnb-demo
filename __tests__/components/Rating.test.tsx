@@ -1,6 +1,6 @@
 import React from 'react';
-import { render } from '../utils/test-utils';
 import Rating from '@/components/home/Rating';
+import { render } from '../utils/test-utils';
 
 // Mock colors constant
 jest.mock('@/constants/colors', () => ({
