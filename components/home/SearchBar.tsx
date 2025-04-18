@@ -2,47 +2,82 @@ import React from 'react';
 import { View, TextInput, Pressable, Text } from 'react-native';
 import { Search, MapPin, Users } from 'lucide-react-native';
 import Colors from '@/constants/colors';
-import { useFiltersStore } from '@/store/filters';
 
-const SearchBar = () => {
-  const { searchQuery, setSearchQuery } = useFiltersStore();
-  
+export interface SearchBarProps {
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  onLocationPress?: () => void;
+  onDatePress?: () => void;
+  onGuestsPress?: () => void;
+  onSearchBarPress?: () => void;
+  placeholder?: string;
+}
+
+const SearchBar = ({
+  searchQuery,
+  onSearchChange,
+  onLocationPress,
+  onDatePress,
+  onGuestsPress,
+  onSearchBarPress,
+  placeholder = 'Where to?'
+}: SearchBarProps) => {
   return (
-    <View className={styles.container}>
-      <View className={styles.searchWrapper}>
+    <View className={styles.container} testID="search-container">
+      <Pressable 
+        className={styles.searchWrapper}
+        onPress={onSearchBarPress}
+        testID="search-bar"
+      >
         <View className={styles.searchBar}>
-          <View className={styles.searchIconContainer}>
+          <View className={styles.searchIconContainer} testID="search-icon">
             <Search size={18} color={Colors.light.text} />
           </View>
           <View className={styles.inputContainer}>
             <TextInput
               className={styles.input}
-              placeholder="Where to?"
+              placeholder={placeholder}
               placeholderTextColor={Colors.light.lightText}
               value={searchQuery}
-              onChangeText={setSearchQuery}
+              onChangeText={onSearchChange}
+              testID="search-input"
+              accessibilityLabel="Search location input"
             />
           </View>
         </View>
-      </View>
+      </Pressable>
       
       <View className={styles.filtersContainer}>
-        <Pressable className={styles.filterButton}>
-          <MapPin size={14} color={Colors.light.text} />
+        <Pressable 
+          className={styles.filterButton}
+          onPress={onLocationPress}
+          testID="location-filter"
+        >
+          <View testID="location-icon">
+            <MapPin size={14} color={Colors.light.text} />
+          </View>
           <Text className={styles.filterText}>Anywhere</Text>
         </Pressable>
         
         <View className={styles.divider} />
         
-        <Pressable className={styles.filterButton}>
+        <Pressable 
+          className={styles.filterButton}
+          onPress={onDatePress}
+          testID="date-filter"
+        >
           <Text className={styles.filterText}>Any week</Text>
         </Pressable>
         
         <View className={styles.divider} />
         
-        <Pressable className={styles.filterButton}>
+        <Pressable 
+          className={styles.filterButton}
+          onPress={onGuestsPress}
+          testID="guests-filter"
+        >
           <Text className={styles.filterText}>Add guests</Text>
-          <View className={styles.guestsIcon}>
+          <View className={styles.guestsIcon} testID="guests-icon">
             <Users size={14} color={Colors.light.text} />
           </View>
         </Pressable>
@@ -64,6 +99,5 @@ const styles = {
   divider: 'w-[1px] h-4 bg-gray-200 mx-2',
   guestsIcon: 'ml-1'
 };
-
 
 export default SearchBar;

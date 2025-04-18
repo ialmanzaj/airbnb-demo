@@ -2,42 +2,82 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, Image, Dimensions } from 'react-native';
 import { Heart } from 'lucide-react-native';
 import Colors from '@/constants/colors';
-import { InstaQLEntity } from '@instantdb/react-native';
-import { AppSchema } from '@/instant.schema';
 import Rating from './Rating';
 
-type ListingWithDetails = InstaQLEntity<
-  AppSchema,
-  'listings',
-  {
-    images: {};
-    location: {};
-    pricing: {};
-  }
->;
+export interface PropertyImage {
+  id: string;
+  url: string;
+  caption?: string;
+  isPrimary?: boolean;
+  order?: number;
+}
+
+export interface PropertyLocation {
+  id: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  zipCode: string;
+  lat: number;
+  lng: number;
+}
+
+export interface PropertyPricing {
+  id: string;
+  basePrice: number;
+  cleaningFee: number;
+  serviceFee: number;
+  currency: string;
+  minNights: number;
+  maxNights: number;
+}
+
+export interface Property {
+  id: string;
+  status: string;
+  createdAt: string | number;
+  updatedAt: string | number;
+  title: string;
+  description: string;
+  type: string;
+  slug: string;
+  maxGuests: number;
+  bedrooms: number;
+  beds: number;
+  baths: number;
+  rating: number;
+  images: PropertyImage[];
+  location?: PropertyLocation;
+  pricing?: PropertyPricing;
+}
 
 interface PropertyCardProps {
-  property: ListingWithDetails;
-  onPress: (property: ListingWithDetails) => void;
+  property: Property;
+  onPress: (property: Property) => void;
+  initialFavorite?: boolean;
+  onFavoriteChange?: (isFavorite: boolean) => void;
 }
 
 const { width } = Dimensions.get('window');
 const cardWidth = width / 2 - 24; // 2 columns with padding
 
-const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
+const PropertyCard = ({ property, onPress, initialFavorite = false, onFavoriteChange }: PropertyCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const images = property.images || [];
   const hasImages = images.length > 0;
 
-  const handleNextImage = () => {
+  const handleNextImage = (e?: any) => {
+    if (e) e.stopPropagation();
     if (!hasImages) return;
     setCurrentImageIndex((prevIndex) =>
       prevIndex === images.length - 1 ? 0 : prevIndex + 1
     );
   };
 
-  const handlePrevImage = () => {
+  const handlePrevImage = (e?: any) => {
+    if (e) e.stopPropagation();
     if (!hasImages) return;
     setCurrentImageIndex((prevIndex) =>
       prevIndex === 0 ? images.length - 1 : prevIndex - 1
@@ -46,7 +86,11 @@ const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
 
   const toggleFavorite = (e: any) => {
     e.stopPropagation();
-    setIsFavorite(!isFavorite);
+    const newValue = !isFavorite;
+    setIsFavorite(newValue);
+    if (onFavoriteChange) {
+      onFavoriteChange(newValue);
+    }
   };
 
   const locationString = property.location
@@ -60,6 +104,7 @@ const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
       className={styles.container}
       style={{ width: cardWidth }}
       onPress={() => onPress(property)}
+      testID="property-card"
     >
       <View className={styles.imageContainer} style={{ height: cardWidth * 1.1 }}>
         {currentImageUrl ? (
@@ -67,6 +112,7 @@ const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
             source={{ uri: currentImageUrl }}
             className={styles.image}
             resizeMode="cover"
+            testID="property-image"
           />
         ) : (
           <View className={`${styles.image} ${styles.placeholderImage}`}>
@@ -79,11 +125,13 @@ const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
         <Pressable 
           className={styles.favoriteButton}
           onPress={toggleFavorite}
+          testID="favorite-button"
         >
           <Heart 
             size={20} 
             color={isFavorite ? Colors.light.primary : 'white'} 
             fill={isFavorite ? Colors.light.primary : 'transparent'} 
+            testID="heart-icon"
           />
         </Pressable>
         
@@ -93,6 +141,7 @@ const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
               <View 
                 key={index} 
                 className={`${styles.dot} ${index === currentImageIndex ? styles.activeDot : ''}`}
+                testID={`image-dot-${index}`}
               />
             ))}
           </View>
@@ -103,6 +152,7 @@ const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
             <Pressable 
               className={`${styles.navButton} ${styles.prevButton}`}
               onPress={handlePrevImage}
+              testID="prev-image-button"
             >
               <Text style={{ color: Colors.light.text }} className={styles.navButtonText}>‹</Text>
             </Pressable>
@@ -110,6 +160,7 @@ const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
             <Pressable 
               className={`${styles.navButton} ${styles.nextButton}`}
               onPress={handleNextImage}
+              testID="next-image-button"
             >
               <Text style={{ color: Colors.light.text }} className={styles.navButtonText}>›</Text>
             </Pressable>
