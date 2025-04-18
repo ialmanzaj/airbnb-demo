@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, Text, ScrollView, Pressable } from 'react-native';
-import { Home, Building, Tent, Warehouse, Palmtree, Castle, Sailboat, Flame } from 'lucide-react-native';
+import { View, Text, Pressable, ScrollView } from 'react-native';
+import { Flame, Home, Building, Tent, Warehouse, Palmtree, Castle, Sailboat } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 
 interface FilterItemProps {
@@ -12,13 +12,16 @@ interface FilterItemProps {
 
 const FilterItem = ({ icon, label, isActive = false, onPress }: FilterItemProps) => (
   <Pressable 
-    style={[styles.filterItem, isActive && styles.activeFilterItem]} 
+    className={`${styles.filterItem} ${isActive ? styles.activeFilterItem : ''}`}
     onPress={onPress}
   >
-    <View style={[styles.iconContainer, isActive && styles.activeIconContainer]}>
+    <View className={`${styles.iconContainer} ${isActive ? styles.activeIconContainer : ''}`}>
       {icon}
     </View>
-    <Text style={[styles.filterLabel, isActive && styles.activeFilterLabel]}>
+    <Text 
+      className={`${styles.filterLabel} ${isActive ? styles.activeFilterLabel : ''}`}
+      style={{ color: isActive ? Colors.light.text : Colors.light.lightText }}
+    >
       {label}
     </Text>
   </Pressable>
@@ -32,11 +35,11 @@ const FilterBar = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View className={styles.container}>
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        className={styles.scrollContent}
       >
         <FilterItem 
           icon={<Flame size={18} color={activeFilter === 'Trending' ? Colors.light.primary : Colors.light.text} />} 
@@ -91,40 +94,22 @@ const FilterBar = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: Colors.light.background,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.light.border,
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-    gap: 24,
-  },
-  filterItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  activeFilterItem: {
-    opacity: 1,
-  },
-  iconContainer: {
-    marginBottom: 6,
-    opacity: 0.7,
-  },
-  activeIconContainer: {
-    opacity: 1,
-  },
-  filterLabel: {
-    fontSize: 12,
-    color: Colors.light.lightText,
-    textAlign: 'center',
-  },
-  activeFilterLabel: {
-    color: Colors.light.text,
-    fontWeight: '500',
-  },
-});
+const styles = {
+  // Layout
+  container: 'bg-white py-3 border-b border-[#DDDDDD]',
+  scrollContent: 'px-4',
+  filterItem: 'items-center justify-center mr-6',
+  
+  // Interactive Elements
+  activeFilterItem: 'opacity-100',
+  
+  // Icon Styling
+  iconContainer: 'mb-1.5 opacity-70',
+  activeIconContainer: 'opacity-100',
+  
+  // Typography
+  filterLabel: 'text-xs text-center',
+  activeFilterLabel: 'font-medium'
+};
 
 export default FilterBar;

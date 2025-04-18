@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { View, Text } from 'react-native';
 import { Star } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 
@@ -19,31 +19,28 @@ const Rating = ({
   const starSize = size === 'small' ? 12 : size === 'medium' ? 14 : 16;
   
   return (
-    <View style={styles.container}>
+    <View className={styles.container}>
       <Star 
         size={starSize} 
         color={Colors.light.rating} 
         fill={Colors.light.rating} 
       />
-      <Text style={[
-        styles.ratingText, 
-        size === 'small' && styles.smallText,
-        size === 'large' && styles.largeText
-      ]}>
+      <Text className={`${styles.ratingText} ${
+        size === 'small' ? styles.smallText : 
+        size === 'large' ? styles.largeText : ''
+      }`}>
         {rating.toFixed(2)}
       </Text>
       {showReviewCount && reviewCount > 0 && (
         <>
-          <Text style={[
-            styles.separator, 
-            size === 'small' && styles.smallText,
-            size === 'large' && styles.largeText
-          ]}>·</Text>
-          <Text style={[
-            styles.reviewCount, 
-            size === 'small' && styles.smallText,
-            size === 'large' && styles.largeText
-          ]}>
+          <Text className={`${styles.separator} ${
+            size === 'small' ? styles.smallText : 
+            size === 'large' ? styles.largeText : ''
+          }`}>·</Text>
+          <Text className={`${styles.reviewCount} ${
+            size === 'small' ? styles.smallText : 
+            size === 'large' ? styles.largeText : ''
+          }`}>
             {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
           </Text>
         </>
@@ -52,32 +49,18 @@ const Rating = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  ratingText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: Colors.light.text,
-    marginLeft: 4,
-  },
-  separator: {
-    fontSize: 14,
-    color: Colors.light.lightText,
-    marginHorizontal: 4,
-  },
-  reviewCount: {
-    fontSize: 14,
-    color: Colors.light.lightText,
-  },
-  smallText: {
-    fontSize: 12,
-  },
-  largeText: {
-    fontSize: 16,
-  },
-});
+const styles = {
+  // Layout
+  container: 'flex-row items-center',
+  
+  // Typography
+  ratingText: 'text-sm font-medium text-gray-900 ml-1',
+  separator: 'text-sm text-gray-500 mx-1',
+  reviewCount: 'text-sm text-gray-500',
+  
+  // Size Variants
+  smallText: 'text-xs',
+  largeText: 'text-base'
+};
 
 export default Rating;
