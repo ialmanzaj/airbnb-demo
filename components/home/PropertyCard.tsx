@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, Pressable, Dimensions, Image } from 'react-native';
+import { View, Text, Pressable, Image, Dimensions } from 'react-native';
 import { Heart } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { InstaQLEntity } from '@instantdb/react-native';
@@ -53,29 +53,31 @@ const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
     ? `${property.location.city}, ${property.location.state}`
     : 'Location unavailable';
   const basePrice = property.pricing?.basePrice;
-
   const currentImageUrl = hasImages ? images[currentImageIndex]?.url : undefined;
 
   return (
     <Pressable 
-      style={styles.container}
+      className={styles.container}
+      style={{ width: cardWidth }}
       onPress={() => onPress(property)}
     >
-      <View style={styles.imageContainer}>
+      <View className={styles.imageContainer} style={{ height: cardWidth * 1.1 }}>
         {currentImageUrl ? (
           <Image 
             source={{ uri: currentImageUrl }}
-            style={styles.image}
+            className={styles.image}
             resizeMode="cover"
           />
         ) : (
-          <View style={[styles.image, styles.placeholderImage]}>
-            <Text style={styles.placeholderText}>No Image</Text>
+          <View className={`${styles.image} ${styles.placeholderImage}`}>
+            <Text style={{ color: Colors.light.lightText }} className={styles.placeholderText}>
+              No Image
+            </Text>
           </View>
         )}
         
         <Pressable 
-          style={styles.favoriteButton}
+          className={styles.favoriteButton}
           onPress={toggleFavorite}
         >
           <Heart 
@@ -86,14 +88,11 @@ const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
         </Pressable>
         
         {hasImages && images.length > 1 && (
-          <View style={styles.imageNavigation}>
+          <View className={styles.imageNavigation}>
             {images.map((_, index) => (
               <View 
                 key={index} 
-                style={[
-                  styles.dot, 
-                  index === currentImageIndex && styles.activeDot
-                ]} 
+                className={`${styles.dot} ${index === currentImageIndex ? styles.activeDot : ''}`}
               />
             ))}
           </View>
@@ -102,165 +101,82 @@ const PropertyCard = ({ property, onPress }: PropertyCardProps) => {
         {hasImages && images.length > 1 && (
           <>
             <Pressable 
-              style={[styles.navButton, styles.prevButton]} 
+              className={`${styles.navButton} ${styles.prevButton}`}
               onPress={handlePrevImage}
             >
-              <Text style={styles.navButtonText}>‹</Text>
+              <Text style={{ color: Colors.light.text }} className={styles.navButtonText}>‹</Text>
             </Pressable>
             
             <Pressable 
-              style={[styles.navButton, styles.nextButton]} 
+              className={`${styles.navButton} ${styles.nextButton}`}
               onPress={handleNextImage}
             >
-              <Text style={styles.navButtonText}>›</Text>
+              <Text style={{ color: Colors.light.text }} className={styles.navButtonText}>›</Text>
             </Pressable>
           </>
         )}
       </View>
       
-      <View style={styles.infoContainer}>
-        <View style={styles.titleRow}>
-          <Text style={styles.location} numberOfLines={1}>
+      <View className={styles.infoContainer}>
+        <View className={styles.titleRow}>
+          <Text style={{ color: Colors.light.text }} className={styles.location} numberOfLines={1}>
             {locationString}
           </Text>
           <Rating rating={property.rating} size="small" showReviewCount={false} />
         </View>
         
-        <Text style={styles.title} numberOfLines={2}>
+        <Text style={{ color: Colors.light.lightText }} className={styles.title} numberOfLines={2}>
           {property.title}
         </Text>
         
         {basePrice !== undefined ? (
-          <View style={styles.priceContainer}>
-            <Text style={styles.price}>
+          <View className={styles.priceContainer}>
+            <Text style={{ color: Colors.light.text }} className={styles.price}>
               ${basePrice}
             </Text>
-            <Text style={styles.night}> night</Text>
+            <Text style={{ color: Colors.light.text }} className={styles.night}> night</Text>
           </View>
         ) : (
-          <Text style={styles.priceUnavailable}>Price unavailable</Text>
+          <Text style={{ color: Colors.light.lightText }} className={styles.priceUnavailable}>
+            Price unavailable
+          </Text>
         )}
       </View>
     </Pressable>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    width: cardWidth,
-    marginBottom: 20,
-  },
-  imageContainer: {
-    position: 'relative',
-    width: '100%',
-    height: cardWidth * 1.1,
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 10,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  favoriteButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    zIndex: 10,
-  },
-  imageNavigation: {
-    position: 'absolute',
-    bottom: 10,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    marginHorizontal: 2,
-  },
-  activeDot: {
-    backgroundColor: 'white',
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  navButton: {
-    position: 'absolute',
-    top: '50%',
-    transform: [{ translateY: -15 }],
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    opacity: 0.8,
-  },
-  prevButton: {
-    left: 10,
-  },
-  nextButton: {
-    right: 10,
-  },
-  navButtonText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.light.text,
-  },
-  infoContainer: {
-    paddingHorizontal: 2,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  location: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: Colors.light.text,
-    flex: 1,
-    marginRight: 8,
-  },
-  title: {
-    fontSize: 14,
-    color: Colors.light.lightText,
-    marginBottom: 4,
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-  },
-  price: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: Colors.light.text,
-  },
-  night: {
-    fontSize: 14,
-    color: Colors.light.text,
-  },
-  placeholderImage: {
-    backgroundColor: Colors.light.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  placeholderText: {
-    color: Colors.light.lightText,
-    fontSize: 16,
-  },
-  priceUnavailable: {
-    fontSize: 14,
-    color: Colors.light.lightText,
-    marginTop: 4,
-  },
-});
+const styles = {
+  // Layout
+  container: 'mb-5',
+  imageContainer: 'relative w-full rounded-xl overflow-hidden mb-2.5',
+  image: 'w-full h-full',
+  infoContainer: 'px-0.5',
+  titleRow: 'flex-row justify-between items-center mb-1',
+  priceContainer: 'flex-row items-baseline',
+
+  // Interactive Elements
+  favoriteButton: 'absolute top-2.5 right-2.5 z-10',
+  navButton: 'absolute top-1/2 -translate-y-[15px] w-[30px] h-[30px] rounded-full bg-white/80 justify-center items-center opacity-80',
+  prevButton: 'left-2.5',
+  nextButton: 'right-2.5',
+  
+  // Image Navigation
+  imageNavigation: 'absolute bottom-2.5 left-0 right-0 flex-row justify-center items-center',
+  dot: 'w-1.5 h-1.5 rounded-full bg-white/50 mx-0.5',
+  activeDot: 'bg-white w-2 h-2 rounded-full',
+  
+  // Typography
+  location: 'text-sm font-medium flex-1 mr-2',
+  title: 'text-sm mb-1',
+  price: 'text-base font-bold',
+  night: 'text-sm',
+  navButtonText: 'text-xl font-bold',
+  placeholderText: 'text-base',
+  priceUnavailable: 'text-sm mt-1',
+  
+  // Visual States
+  placeholderImage: 'bg-gray-200 justify-center items-center'
+};
 
 export default PropertyCard;

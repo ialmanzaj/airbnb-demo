@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, FlatList, Pressable, Text, Alert } from 'react-native';
+import { View, Pressable, Text, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import { Sliders } from 'lucide-react-native';
@@ -11,7 +11,6 @@ import PropertyCard from '@/components/home/PropertyCard';
 import { init, InstaQLEntity } from '@instantdb/react-native';
 import schema, { AppSchema } from "@/instant.schema";
 import { LegendList } from '@legendapp/list';
-
 
 // ID for app: airbnb-demo
 const APP_ID = process.env.EXPO_PUBLIC_INSTANT_APP_ID!;
@@ -62,7 +61,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView className={styles.container} edges={['top', 'bottom']}>
       <Stack.Screen
         options={{
           headerShown: false,
@@ -72,18 +71,20 @@ export default function HomeScreen() {
       <SearchBar />
       <FilterBar />
 
-      <View style={styles.listContainer}>
-        <View style={styles.listHeader}>
-          <Text style={styles.resultsText}>
+      <View className={styles.listContainer}>
+        <View className={styles.listHeader}>
+          <Text style={{ color: Colors.light.text }} className={styles.resultsText}>
             {listings?.length} homes
           </Text>
 
           <Pressable
-            style={styles.filtersButton}
+            className={styles.filtersButton}
             onPress={() => setShowFilters(!showFilters)}
           >
             <Sliders size={16} color={Colors.light.text} />
-            <Text style={styles.filtersButtonText}>Filters</Text>
+            <Text style={{ color: Colors.light.text }} className={styles.filtersButtonText}>
+              Filters
+            </Text>
           </Pressable>
         </View>
 
@@ -93,9 +94,11 @@ export default function HomeScreen() {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           numColumns={2}
-          columnWrapperStyle={styles.columnWrapper as any}
+          columnWrapperStyle={{
+            justifyContent: 'space-between',
+          } as any}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={{ paddingBottom: 20 }}
           recycleItems
         />
       </View>
@@ -103,45 +106,18 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-  },
-  listContainer: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  listHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-  },
-  resultsText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: Colors.light.text,
-  },
-  filtersButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.light.border,
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  filtersButtonText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: Colors.light.text,
-    marginLeft: 6,
-  },
-  listContent: {
-    paddingBottom: 20,
-  },
-  columnWrapper: {
-    justifyContent: 'space-between',
-  },
-});
+const styles = {
+  // Layout
+  container: 'flex-1 bg-white',
+  listContainer: 'flex-1 px-4',
+  listHeader: 'flex-row justify-between items-center py-4',
+  columnWrapper: 'justify-between',
+  listContent: 'pb-5',
+  
+  // Typography
+  resultsText: 'text-sm font-medium',
+  filtersButtonText: 'text-sm font-medium ml-1.5',
+  
+  // Interactive
+  filtersButton: 'flex-row items-center border border-gray-200 rounded-full px-3 py-1.5'
+};
