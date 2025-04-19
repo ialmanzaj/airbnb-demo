@@ -1,0 +1,140 @@
+{
+  "reviews": {
+    "bind": [
+      "isReviewAuthor",
+      "auth.id != null && auth.id == data.ref('author.id')",
+      "canCreateReview",
+      "auth.id != null && (auth.id == data.ref('booking.guest.id') || auth.id == data.ref('booking.listing.host.id'))"
+    ],
+    "allow": {
+      "view": "true",
+      "create": "canCreateReview",
+      "delete": "isReviewAuthor",
+      "update": "isReviewAuthor"
+    }
+  },
+  "$users": {
+    "allow": {
+      "view": "true",
+      "create": "false",
+      "delete": "false",
+      "update": "false"
+    }
+  },
+  "profiles": {
+    "bind": [
+      "isOwnProfile",
+      "auth.id != null && auth.id == data.ref('$users.id')"
+    ],
+    "allow": {
+      "view": "true",
+      "create": "auth.id != null",
+      "delete": "isOwnProfile",
+      "update": "isOwnProfile"
+    }
+  },
+  "locations": {
+    "bind": [
+      "isHost",
+      "auth.id != null && auth.id in data.ref('profiles.isHost')",
+      "isListingOwner",
+      "auth.id != null && auth.id == data.ref('listing.host.id')"
+    ],
+    "allow": {
+      "view": "true",
+      "create": "isHost",
+      "delete": "isListingOwner",
+      "update": "isListingOwner"
+    }
+  },
+  "listings": {
+    "bind": [
+      "isHost",
+      "auth.id != null && auth.id in data.ref('profiles.isHost')",
+      "isListingOwner",
+      "auth.id != null && auth.id == data.ref('host.id')"
+    ],
+    "allow": {
+      "view": "true",
+      "create": "isHost",
+      "delete": "isListingOwner",
+      "update": "isListingOwner"
+    }
+  },
+  "amenities": {
+    "bind": [
+      "isHost",
+      "auth.id != null && auth.id in data.ref('profiles.isHost')",
+      "isListingOwner",
+      "auth.id != null && auth.id == data.ref('listing.host.id')"
+    ],
+    "allow": {
+      "view": "true",
+      "create": "isHost",
+      "delete": "isListingOwner",
+      "update": "isListingOwner"
+    }
+  },
+  "bookings": {
+    "bind": [
+      "isBookingParticipant",
+      "auth.id != null && (auth.id == data.ref('guest.id') || auth.id == data.ref('listing.host.id'))"
+    ],
+    "allow": {
+      "view": "isBookingParticipant",
+      "create": "auth.id != null",
+      "delete": "isBookingParticipant",
+      "update": "isBookingParticipant"
+    }
+  },
+  "$default": {
+    "allow": {
+      "view": "auth.id != null",
+      "$default": "false"
+    }
+  },
+  "images": {
+    "bind": [
+      "isHost",
+      "auth.id != null && auth.id in data.ref('profiles.isHost')",
+      "isListingOwner",
+      "auth.id != null && auth.id == data.ref('listing.host.id')"
+    ],
+    "allow": {
+      "view": "true",
+      "create": "isHost",
+      "delete": "isListingOwner",
+      "update": "isListingOwner"
+    }
+  },
+  "pricing": {
+    "bind": [
+      "isHost",
+      "auth.id != null && auth.id in data.ref('profiles.isHost')",
+      "isListingOwner",
+      "auth.id != null && auth.id == data.ref('listing.host.id')"
+    ],
+    "allow": {
+      "view": "true",
+      "create": "isHost",
+      "delete": "isListingOwner",
+      "update": "isListingOwner"
+    }
+  },
+  "wishlist": {
+    "allow": {
+      "view": "true",
+      "create": "true",
+      "update": "auth.id != null && auth.id == data.ref('$user.id')",
+      "delete": "auth.id != null && auth.id == data.ref('$user.id')"
+    }
+  },
+  "attrs": {
+    "allow": {
+      "view": "true",
+      "create": "true",
+      "update": "auth.id != null",
+      "delete": "auth.id != null"
+    }
+  }
+} 
