@@ -1,0 +1,92 @@
+<context>
+# Overview
+This product is a clone of the popular accommodation booking platform, Airbnb. It aims to connect users seeking short-term rentals (Guests) with property owners offering such rentals (Hosts). The core value proposition is providing a user-friendly, mobile-first platform for discovering, booking, and managing property stays, leveraging real-time database features for a dynamic experience.
+
+# Core Features
+-   **User Authentication:** Secure sign-up, login, and profile management for both Guests and Hosts.
+-   **Property Listings:** Hosts can create, view, update, and delete property listings, including details like description, location, price, availability, amenities, and photos.
+-   **Search & Filtering:** Guests can search for listings based on location, dates, number of guests, and filter results by price range, property type, amenities, etc.
+-   **Booking System:** Guests can request to book properties, Hosts can approve/decline requests, and confirmed bookings are tracked with calendar integration.
+-   **Wishlist:** Guests can save their favorite properties to a personal wishlist for later review or booking.
+-   **Messaging:** In-app communication channel for Guests and Hosts to discuss booking details or ask questions. (Future Phase)
+-   **Reviews & Ratings:** Guests and Hosts can leave reviews and ratings for each other after a completed stay. (Future Phase)
+
+# User Experience
+-   **User Personas:**
+    -   *Guest (Traveler):* Seeking unique, convenient, and affordable accommodation options. Values ease of search, clear listing details, secure booking, and communication.
+    -   *Host (Property Owner):* Looking to monetize their property. Values easy listing management, reliable booking system, secure payments (future), and communication tools.
+-   **Key User Flows:**
+    -   *Guest:* Sign Up/Login -> Search Listings -> Filter Results -> View Listing Details -> Add to Wishlist / Request to Book -> Communicate with Host -> Complete Stay -> Leave Review.
+    -   *Host:* Sign Up/Login -> Create Listing -> Manage Availability -> Receive Booking Request -> Approve/Decline -> Communicate with Guest -> Receive Payment (future) -> Leave Review.
+-   **UI/UX Considerations:**
+    -   Mobile-first design optimized for React Native (Expo).
+    -   Clean, intuitive interface mimicking Airbnb's aesthetic.
+    -   Interactive map integration for location search (future enhancement).
+    -   Use of Tailwind CSS for consistent styling.
+    -   Leverage `LegendList` for performant scrolling lists.
+    -   Real-time updates for booking status and messages (where applicable).
+</context>
+<PRD>
+# Technical Architecture
+-   **Frontend:** React Native (Expo SDK), TypeScript.
+-   **UI Framework:** NativeWind/Tailwind CSS for styling.
+-   **Navigation:** `react-navigation` and `expo-router`.
+-   **Database & Backend:** InstantDB for real-time data synchronization, user management, listings, bookings, wishlists, etc.
+-   **State Management:** React Context API with `useReducer` or Zustand for global state (e.g., auth status), local state for component-specific logic. Follow `react-best-practices.mdc`.
+-   **Data Fetching:** Direct real-time queries using InstantDB's hooks (`db.useQuery`). Server state managed via InstantDB.
+-   **List Rendering:** `LegendList` component for optimized performance (Rule: `2002-legend-list.mdc`).
+-   **Forms:** React Hook Form for handling form state and validation.
+-   **Testing:** Jest/React Native Testing Library for unit/integration tests, Detox/Maestro for E2E tests (Rule: `300-airbnb-testing.mdc`).
+-   **External APIs:** Potential integration with mapping services (e.g., Mapbox, Nominatim for geocoding) and payment gateways (e.g., Stripe) in future phases.
+
+# Development Roadmap (Phases)
+-   **Phase 1 (Foundation & Core Read):**
+    -   Project Setup (Expo, TypeScript, Tailwind, InstantDB, Task Master).
+    -   User Authentication (Sign Up, Login, Session Management).
+    -   Basic Listing Display (Reading listing data from InstantDB).
+    -   Tab Navigation Setup ((Explore), Wishlist, Profile shells).
+    -   Basic Search Functionality (Location-based text search).
+-   **Phase 2 (Host CRUD & Enhanced Search):**
+    -   Full CRUD operations for Property Listings (Create, Update, Delete for Hosts).
+    -   Image Upload/Management for Listings.
+    -   Advanced Search Filtering (Dates, Guests, Price, Type).
+-   **Phase 3 (Core Traveler Actions):**
+    -   Wishlist functionality (Add/Remove/View).
+    -   Booking Flow (Request to Book, View Booking Status).
+    -   Host Booking Management (Approve/Decline Requests, View Bookings).
+    -   Basic Calendar View for Availability.
+-   **Phase 4 (Interaction & Polish):**
+    -   Messaging System between Guests and Hosts.
+    -   Reviews and Rating System.
+    -   Map View Integration for Search Results.
+    -   UI Polish & Performance Optimization.
+-   **Future Enhancements:**
+    -   Payment Integration (Stripe).
+    -   Notifications (Push notifications via Expo).
+    -   Admin Dashboard.
+    -   Instant Book feature.
+    -   Advanced Host Tools (Pricing strategies, analytics).
+
+# Logical Dependency Chain
+1.  Project Setup & Auth.
+2.  Listing Read (Displaying existing listings).
+3.  Basic Search (Finding listings).
+4.  Listing CRUD (Allowing hosts to add/manage listings).
+5.  Wishlist (Saving listings).
+6.  Booking (Core transaction).
+7.  Messaging (Communication layer, depends on booking/users).
+8.  Reviews (Depends on completed bookings).
+*Goal: Get to a usable state quickly (Auth -> Listing Read -> Search -> Basic Wishlist/Booking UI).*
+
+# Risks and Mitigations
+-   **Technical Complexity (InstantDB):** Steep learning curve. Mitigation: Follow `2000-instant-db.mdc` rules strictly, implement incrementally, thorough testing.
+-   **Real-time Synchronization:** Potential for complex state management and race conditions. Mitigation: Careful design of queries and transactions, use InstantDB features appropriately, robust testing.
+-   **Scope Creep:** Tendency to add features beyond MVP. Mitigation: Adhere strictly to the phased roadmap, prioritize core functionality for each phase.
+-   **UI Consistency:** Maintaining an Airbnb-like feel requires careful styling. Mitigation: Strictly follow Tailwind rules (`2001-tailwind-styling.mdc`) and component design principles (`2001-component-design.mdc`).
+-   **Performance:** Large lists or complex queries could impact performance. Mitigation: Use `LegendList`, optimize InstantDB queries (`2000-instant-db.mdc`), implement pagination/virtualization where needed.
+
+# Appendix
+-   Cursor Rules: `.cursor/rules/` directory (Includes `2000-expo.mdc`, `2000-instant-db.mdc`, `2001-tailwind-styling.mdc`, `2002-legend-list.mdc`, `react-best-practices.mdc`, etc.)
+-   Design Inspirations: Airbnb mobile application UI.
+-   Potential Libraries: `react-hook-form`, `date-fns`, `react-native-maps` (future).
+</PRD> 

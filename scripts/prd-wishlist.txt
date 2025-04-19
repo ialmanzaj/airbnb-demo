@@ -1,0 +1,64 @@
+# Feature: Wishlist Screen
+
+## 1. Overview
+
+The Wishlist screen allows authenticated Guests (`$users`) to view, manage, and access listings (`listings`) they have previously saved via the `wishlist` entity. It serves as a personalized collection of potential stays. This screen utilizes abstractions from `lib/wishlist.ts` for data fetching and mutations.
+
+## 2. Core Functionality
+
+- **View Wishlisted Items:** Display a list or grid of properties (`listings`) linked to the current user's `wishlist` entries, fetched using the `useWishlist` hook from `lib/wishlist.ts`.
+- **Remove from Wishlist:** Allow users to easily remove a property by calling the `removeFromWishlist` function from `lib/wishlist.ts`, passing the relevant `wishlist.id`.
+- **Navigate to Listing Details:** Each item in the wishlist should link directly to its full listing details page (e.g., `/listing/[slug]` or `/listing/[id]`).
+- **Real-time Updates:** The list should reflect additions or removals made elsewhere in the app in near real-time, as handled by the underlying `useWishlist` hook.
+
+## 3. User Experience (UX)
+
+- **Layout:** Display wishlisted items in a visually appealing grid format. Use `LegendList` for performance (Rule: `2002-legend-list.mdc`).
+- **Wishlist Item Component:** Each item in the grid (`WishlistItemCard`) should display key listing information derived from the data provided by `useWishlist`. **Reuse existing components where possible:**
+  - Primary Image (from `listing.images` link, where `isPrimary` is true - consider adapting `ImageCarousel.tsx` or using a simple `Image`).
+  - Listing Title (`listing.title`).
+  - Location (City/Region from `listing.location` link -> `locations.city`, `locations.state`).
+  - Price per night (`listing.pricing` link -> `pricing.basePrice` - **reuse `PriceDisplay.tsx`**).
+  - Average Rating (`listing.rating` - **reuse `Rating.tsx`**).
+  - A "Remove from Wishlist" control (e.g., a heart icon) that triggers the `removeFromWishlist` function with the `wishlist.id`. **Reuse or adapt `WishlistFavoriteButton.tsx` or `FavoriteButton.tsx`**.
+- **States:**
+  - _Loading State:_ Handled via the `isLoading` property returned by `useWishlist`. Show a placeholder/skeleton loader.
+  - _Empty State:_ Display a user-friendly message if the `wishlist` array returned by `useWishlist` is empty. **Use the `components/common/EmptyState.tsx` component**.
+  - _Error State:_ Handled via the `error` property returned by `useWishlist`. Display an error message.
+  - _Populated State:_ Show the grid of wishlisted items.
+- **Interaction:** Smooth scrolling, responsive tap targets for removing items and navigating to details. Handle loading/disabled state for the remove button during the mutation.
+
+## 4. Technical Requirements
+
+- **Data Fetching:**
+  - Utilize the `useWishlist()` hook from `lib/wishlist.ts` to fetch the necessary wishlist entries and their linked listing data.
+  - The hook encapsulates the required InstantDB query and returns `{ wishlist, isLoading, error }`.
+  - The structure of the returned `wishlist` items should conform to the nested data needed for the `WishlistItemCard` (listing title, rating, location, pricing, primary image). Ensure `useWishlist` provides this structure.
+- **Data Structure (InstantDB - Used by `lib/wishlist.ts`):**
+  - `wishlist`: Contains `id`, `createdAt`, `status`. Linked to `$users` (via `wishlistUser`) and `listings` (via `wishlistListing`).
+  - `listings`: Contains `id`, `title`, `slug`, `rating`, etc. Linked to `locations`, `pricing`, `images`.
+  - `locations`, `pricing`, `images` as defined in `lib/db.ts`.
+- **Component:** `app/(tabs)/wishlist.tsx` will contain the main screen logic, utilizing `useWishlist`.
+- **Sub-Components:** Create a reusable `WishlistItemCard` component for the grid display, accepting data for a single wishlist item (including nested listing details) as props. **Compose using existing components** (`PriceDisplay`, `Rating`, `WishlistFavoriteButton`, etc.) as noted in UX section.
+- **State Management:** Primarily local state for UI interaction (e.g., temporary disabled state while removing). Loading and error states are managed by `useWishlist`. Authentication context is implicitly handled by hooks in `lib/wishlist.ts`.
+- **Mutations (Remove):**
+  - Call the `async function removeFromWishlist(wishlistId: string)` from `lib/wishlist.ts` when the user interacts with the remove control.
+  - Pass the `id` of the specific `wishlist` entry to the function.
+  - Handle the `Promise<WishlistOperationResult>` returned by the function to show success/error feedback to the user (e.g., using toasts or alerts). **Reference the interaction pattern (loading/error handling) in `WishlistFavoriteButton.tsx`**.
+- **Styling:** Use Tailwind CSS via NativeWind, adhering to `2001-tailwind-styling.mdc`.
+- **Navigation:** Use `expo-router` to navigate from a `WishlistItemCard` to the corresponding listing detail screen using `listing.slug` or `listing.id`.
+- **Testing:** Unit/integration tests for `WishlistScreen` and `WishlistItemCard`. Mock the `lib/wishlist.ts` hooks/functions (`useWishlist`, `removeFromWishlist`) to test different states (loading, empty, populated, error) and the removal interaction flow (Rule: `300-airbnb-testing.mdc`). **Utilize existing test setup/utilities** from `__tests__/utils` and `__tests__/setup.ts`.
+
+## 5. Dependencies & Order
+
+- **`lib/wishlist.ts`:** The core hooks and functions (`useWishlist`, `removeFromWishlist`, etc.) must be implemented and tested.
+- **Authentication System:** Although direct `userId` handling is out of scope for the screen component, the underlying auth context and InstantDB auth rules must be functional for `lib/wishlist.ts` to work correctly.
+- **Listing Data & Links:** Base `listings` data and necessary links (`location`, `pricing`, `images`) must be queryable.
+- **Listing Detail Screen:** Required for navigation.
+- **Add-to-Wishlist Functionality:** Required elsewhere (e.g., Listing Detail screen) using `addToWishlist` or `toggleWishlist` from `lib/wishlist.ts` to populate the list.
+- Fits within **Phase 3 (Core Traveler Actions)** of the main roadmap (`scripts/prd.txt`).
+
+## 6. Risks & Mitigations
+
+- **`lib/wishlist.ts` Abstraction:** Ensure the hook (`useWishlist`) provides all necessary nested data efficiently. Mitigation: Refine the query within `useWishlist` if needed, adhering to `2000-instant-db.mdc`. Verify data structure returned by the hook.
+- **Error Handling:** Need robust handling of errors from `removeFromWishlist`. Mitigation: Implement clear user feedback (e.g., toasts) for mutation success/failure based on `WishlistOperationResult`.

@@ -90,7 +90,7 @@ export function useWishlistExists(listingId: string): boolean {
  * Hook to get all wishlist entries for the current user
  * @returns Array of wishlist entries with listing details
  */
-export function useWishlistEntries() {
+export function useWishlist() {
   const { data, isLoading, error } = db.useQuery({
     wishlist: {
       listing: {},
@@ -98,7 +98,7 @@ export function useWishlistEntries() {
   });
 
   return {
-    entries: data?.wishlist || [],
+    wishlist: data?.wishlist || [],
     isLoading,
     error,
   };

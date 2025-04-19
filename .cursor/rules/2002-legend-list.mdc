@@ -12,40 +12,59 @@ alwaysApply: false
 - When implementing grid or column-based lists
 
 ## Requirements
-- Use LegendList instead of FlatList or ScrollView for all scrollable lists
-- Always provide estimatedItemSize prop for optimal performance
-- Implement keyExtractor function for unique item identification
-- Use recycleItems prop for memory optimization
-- Handle column layouts using numColumns and columnWrapperStyle
-- Implement proper content container styling
+- Use `LegendList` from `@legendapp/list` instead of `FlatList` or `ScrollView`.
+- Always provide `estimatedItemSize` prop for optimal performance.
+- Implement `keyExtractor` function for unique item identification.
+- Use `recycleItems` prop for memory optimization when applicable.
+- Handle column layouts using `numColumns` and `columnWrapperStyle`.
+- Implement proper content container styling.
 
 ## Examples
+
+Import the component:
+
+```tsx
+import { LegendList } from "@legendapp/list";
+import { Text } from 'react-native'; 
+```
 
 <example>
 ```tsx
 // ✅ Correct implementation using LegendList
+const renderItem = ({ item }) => <Text>{item.title}</Text>; // Example render function
+
 <LegendList
-  estimatedItemSize={200}
-  data={items}
+  estimatedItemSize={200} // Adjust based on your item height
+  data={items} // Your data array
   renderItem={renderItem}
   keyExtractor={(item) => item.id}
-  recycleItems
+  recycleItems // Enable for better memory usage with many items
   contentContainerStyle={{ paddingBottom: 20 }}
 />
 ```
 
 For grid layouts:
 ```tsx
+import { LegendList } from "@legendapp/list";
+import { Text, View } from 'react-native'; // Assuming usage within React Native
+
+// Example render function for grid item
+const renderGridItem = ({ item }) => (
+  <View style={{ flex: 1, margin: 5 }}>
+    <Text>{item.title}</Text>
+  </View>
+);
+
 <LegendList
-  estimatedItemSize={200}
-  data={items}
-  renderItem={renderItem}
+  estimatedItemSize={200} // Adjust based on your item height
+  data={items} // Your data array
+  renderItem={renderGridItem}
   keyExtractor={(item) => item.id}
   numColumns={2}
   columnWrapperStyle={{
-    justifyContent: 'space-between',
+    justifyContent: 'space-between', // Example styling for space between columns
   }}
-  recycleItems
+  recycleItems // Enable for better memory usage
   contentContainerStyle={{ paddingBottom: 20 }}
 />
 ```
@@ -54,26 +73,32 @@ For grid layouts:
 <example type="invalid">
 ```tsx
 // ❌ Incorrect: Using FlatList instead of LegendList
+import { FlatList } from 'react-native';
+
 <FlatList
   data={items}
   renderItem={renderItem}
   keyExtractor={(item) => item.id}
 />
 
-// ❌ Incorrect: Missing required props
+// ❌ Incorrect: Missing required props (estimatedItemSize)
+import { LegendList } from "@legendapp/list";
+
 <LegendList
   data={items}
   renderItem={renderItem}
+  keyExtractor={(item) => item.id}
+  // Missing estimatedItemSize
 />
 ```
 </example>
 
 <critical>
-- NEVER use FlatList or ScrollView for lists
-- ALWAYS provide estimatedItemSize prop
-- ALWAYS implement keyExtractor
-- ALWAYS use recycleItems prop for better performance
-- ENSURE proper typing for data and renderItem props
+- NEVER use `FlatList` or `ScrollView` for lists that could benefit from virtualization.
+- ALWAYS provide the `estimatedItemSize` prop. LegendList will suggest an optimal size in development mode if omitted initially.
+- ALWAYS implement `keyExtractor` for stable identity.
+- CONSIDER using the `recycleItems` prop for large lists or complex items to improve memory usage, similar to FlashList behavior.
+- ENSURE proper typing for `data` and `renderItem` props.
 </critical>
 
-<version>1.0.0</version>
+<version>1.1.0</version> // Updated version
