@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, Image } from 'react-native';
 import Colors from '@/constants/colors';
-import { PropertyImage } from './home/PropertyCard';
+import { PropertyImage } from '@/components/home/PropertyCard';
 
 interface ImageCarouselProps {
   images: PropertyImage[];

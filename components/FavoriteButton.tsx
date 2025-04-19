@@ -12,9 +12,9 @@ interface FavoriteButtonProps {
   testID?: string;
 }
 
-const FavoriteButton = ({ 
-  propertyId, 
-  initialFavorite = false, 
+const FavoriteButton = ({
+  propertyId,
+  initialFavorite = false,
   onFavoriteChange,
   testID = 'favorite-button'
 }: FavoriteButtonProps) => {

@@ -93,6 +93,7 @@ const _schema = i.schema({
     // Wishlist entries
     wishlist: i.entity({
       createdAt: i.date().indexed(),
+      status: i.string().indexed(), // active, inactive
     }),
   },
 

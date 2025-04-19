@@ -1,0 +1,157 @@
+---
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+ # Expo Development Standards
+
+## Context
+- When developing React Native applications using Expo
+- When creating or modifying TypeScript components and utilities
+- When implementing mobile UI features and functionality
+
+## Requirements
+
+### Code Structure and Style
+- Write concise TypeScript code using functional and declarative patterns
+- Avoid class-based components in favor of functional components
+- Use descriptive variable names with auxiliary verbs (isLoading, hasError)
+- Structure files in order: exports, subcomponents, helpers, static content, types
+- Follow directory naming convention: lowercase with dashes (components/auth-wizard)
+- Use named exports for components
+
+### TypeScript Guidelines
+- Use TypeScript for all code files
+- Prefer interfaces over types for object definitions
+- Avoid enums; implement using constant maps instead
+- Enable strict mode in TypeScript configuration
+- Use function keyword for pure functions
+- Write concise conditional statements without unnecessary braces
+
+### UI and Styling
+- Implement UI using Expo's built-in components
+- Use Flexbox with useWindowDimensions for responsive layouts
+- Style components using styled-components or Tailwind CSS
+- Support dark mode via useColorScheme
+- Implement ARIA roles and accessibility props
+- Use react-native-reanimated for animations
+- Use react-native-gesture-handler for gestures
+
+### Safe Area Management
+- Wrap app with SafeAreaProvider from react-native-safe-area-context
+- Use SafeAreaView for top-level components
+- Implement SafeAreaScrollView for scrollable content
+- Avoid hardcoded safe area padding/margins
+
+### Performance
+- Prefer context and reducers over useState/useEffect
+- Use AppLoading and SplashScreen for startup optimization
+- Optimize images with WebP format and expo-image
+- Implement code splitting with Suspense
+- Use memoization (useMemo, useCallback) to prevent re-renders
+
+### Navigation
+- Implement routing using react-navigation
+- Configure deep linking and universal links
+- Use expo-router for dynamic routes
+
+### State Management
+- Use React Context with useReducer for global state
+- Implement react-query for data fetching and caching
+- Consider Zustand/Redux Toolkit for complex state
+- Handle URL parameters with expo-linking
+
+### Error Handling
+- Validate data with Zod
+- Implement Sentry for error logging
+- Handle errors at function start
+- Use early returns for error conditions
+- Avoid else statements; prefer if-return pattern
+- Implement global error boundaries
+- Use expo-error-reporter in production
+
+### Testing
+- Write Jest unit tests
+- Implement Detox for integration testing
+- Use Expo testing tools
+- Create component snapshot tests
+
+### Security
+- Sanitize all user inputs
+- Use react-native-encrypted-storage for sensitive data
+- Implement HTTPS for API communication
+- Follow Expo security guidelines
+
+### Internationalization
+- Implement react-native-i18n or expo-localization
+- Support RTL layouts
+- Configure text scaling for accessibility
+
+## Examples
+
+<example>
+// Good: Functional component with TypeScript
+interface UserProfileProps {
+  userId: string;
+  onUpdate: (data: UserData) => void;
+}
+
+export function UserProfile({ userId, onUpdate }: UserProfileProps) {
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+  
+  return (
+    <SafeAreaView style={{ paddingTop: insets.top }}>
+      <Text>User Profile</Text>
+    </SafeAreaView>
+  );
+}
+</example>
+
+<example type="invalid">
+// Bad: Class component with unsafe typing
+class UserProfile extends React.Component {
+  state = { data: null }
+  
+  render() {
+    return (
+      <View style={{ paddingTop: 50 }}>
+        <Text>User Profile</Text>
+      </View>
+    );
+  }
+}
+</example>
+
+<example>
+// Good: Error handling with early returns
+async function fetchUserData(userId: string): Promise<UserData> {
+  if (!userId) return null;
+  
+  try {
+    const response = await api.get(`/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    logger.error('Failed to fetch user data:', error);
+    throw new Error('User data fetch failed');
+  }
+}
+</example>
+
+<example type="invalid">
+// Bad: Nested error handling
+async function fetchUserData(userId: string) {
+  if (userId) {
+    try {
+      const response = await api.get(`/users/${userId}`);
+      if (response.ok) {
+        return response.data;
+      } else {
+        console.log('Error fetching data');
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+}
+</example>
