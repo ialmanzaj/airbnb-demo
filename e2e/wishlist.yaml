@@ -1,0 +1,32 @@
+appId: com.airbnb.clone
+---
+- launchApp
+- assertVisible: "Saved Properties"
+
+# Test adding a property to wishlist
+- tapOn:
+    text: "Home"
+- assertVisible:
+    id: "property-card"
+- tapOn:
+    id: "favorite-button"
+- assertVisible:
+    id: "heart-icon"
+    attributes:
+      fill: Colors.light.primary
+
+# Test viewing wishlist
+- tapOn:
+    text: "Wishlist"
+- assertVisible:
+    text: "Saved Properties"
+- assertVisible:
+    id: "property-card"
+
+# Test removing from wishlist
+- tapOn:
+    id: "favorite-button"
+- assertVisible:
+    text: "No saved properties"
+- assertVisible:
+    text: "Properties you save will appear here" 

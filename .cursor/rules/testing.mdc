@@ -1,0 +1,150 @@
+---
+description: 
+globs: **/*.test.ts,**/*.test.tsx,**/*.spec.ts,*.spec.ts
+alwaysApply: false
+---
+# React Native Testing Standards
+
+## Context
+- When writing tests for React Native components
+- When testing utility functions and hooks
+- When implementing integration tests
+- When setting up test fixtures and mocks
+
+## Requirements
+- Test files must be co-located with the code they test with `.test.tsx` or `.test.ts` extension
+- Integration tests must be placed in `__tests__` directory
+- Each test file must follow the AAA pattern (Arrange, Act, Assert)
+- Mock external dependencies and native modules
+- Test files must include component rendering, user interactions, and error states
+- Implement snapshot tests for UI components
+- Use proper cleanup in `afterEach` or `afterAll` hooks
+- Test accessibility features
+- Maintain 80% or higher test coverage
+- Use meaningful test descriptions that follow the "it should..." pattern
+
+## Examples
+<example>
+// Good test implementation
+import { render, fireEvent, screen } from '@testing-library/react-native';
+import { ListingCard } from './ListingCard';
+
+describe('ListingCard', () => {
+  const mockProps = {
+    title: 'Beach House',
+    price: 100,
+    onPress: jest.fn(),
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should render listing details correctly', () => {
+    render(<ListingCard {...mockProps} />);
+    
+    expect(screen.getByText('Beach House')).toBeTruthy();
+    expect(screen.getByText('$100')).toBeTruthy();
+  });
+
+  it('should call onPress when pressed', () => {
+    render(<ListingCard {...mockProps} />);
+    
+    fireEvent.press(screen.getByRole('button'));
+    expect(mockProps.onPress).toHaveBeenCalledTimes(1);
+  });
+});
+</example>
+
+<example type="invalid">
+// Invalid test implementation
+test('component works', () => {
+  const component = render(<MyComponent />);
+  expect(component).toBeTruthy();
+});
+</example>
+
+<example>
+// Good hook test
+import { renderHook, act } from '@testing-library/react-native';
+import { useCounter } from './useCounter';
+
+describe('useCounter', () => {
+  it('should increment counter', () => {
+    const { result } = renderHook(() => useCounter());
+
+    act(() => {
+      result.current.increment();
+    });
+
+    expect(result.current.count).toBe(1);
+  });
+});
+</example>
+
+<example type="invalid">
+// Invalid hook test
+test('hook', () => {
+  const hook = useMyHook();
+  hook.doSomething();
+  expect(hook.value).toBe(true);
+});
+</example>
+
+<example>
+// Good mock implementation
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  setItem: jest.fn(),
+  getItem: jest.fn(),
+  removeItem: jest.fn(),
+}));
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+</example>
+
+## Test File Structure
+```typescript
+import { dependencies } from './path';
+
+describe('ComponentOrFeatureName', () => {
+  // Setup/Teardown
+  beforeAll(() => {
+    // One-time setup
+  });
+
+  beforeEach(() => {
+    // Per-test setup
+  });
+
+  afterEach(() => {
+    // Per-test cleanup
+  });
+
+  // Test Groups
+  describe('featureOrBehavior', () => {
+    it('should behave in expected way', () => {
+      // Arrange
+      const setup = {};
+
+      // Act
+      const result = action();
+
+      // Assert
+      expect(result).toBe(expected);
+    });
+  });
+});
+```
+
+## Critical Testing Checklist
+<critical>
+- Never skip error case testing
+- Always cleanup mocks and timers
+- Never use test.only in committed code
+- Always test async operations properly
+- Never test implementation details
+- Always test accessibility features
+</critical>
+</example>

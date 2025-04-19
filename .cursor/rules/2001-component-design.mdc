@@ -1,0 +1,100 @@
+---
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+ # Component Design Best Practices
+
+## Context
+- When creating new components or refactoring existing ones
+- When components need to be reusable across different features
+- When components require unit testing
+- When components need to be extended for future use cases
+
+## Requirements
+- Components must follow Single Responsibility Principle
+- Props must be well-defined with TypeScript interfaces
+- Components must be pure functions when possible
+- State management must be separated from presentation logic
+- Components must have clear and descriptive prop names
+- Components must handle error states and loading states
+- Components must be accessible by default
+- Components must be tested in isolation
+- Components must support theme customization
+- Components must handle edge cases gracefully
+
+## Examples
+
+<example>
+// Good Component Design
+interface ButtonProps {
+  variant: 'primary' | 'secondary';
+  onClick: () => void;
+  isLoading?: boolean;
+  disabled?: boolean;
+  children: React.ReactNode;
+}
+
+const Button = ({
+  variant,
+  onClick,
+  isLoading,
+  disabled,
+  children
+}: ButtonProps) => {
+  return (
+    <button
+      className={`btn-${variant}`}
+      onClick={onClick}
+      disabled={disabled || isLoading}
+      aria-busy={isLoading}
+    >
+      {isLoading ? <Spinner /> : children}
+    </button>
+  );
+};
+</example>
+
+<example type="invalid">
+// Poor Component Design
+const Button = (props) => {
+  const [loading, setLoading] = useState(false);
+  
+  const handleClick = async () => {
+    setLoading(true);
+    await props.onClick();
+    setLoading(false);
+  };
+
+  return (
+    <button onClick={handleClick} style={{ background: props.color }}>
+      {loading ? 'Loading...' : props.text}
+    </button>
+  );
+};
+</example>
+
+## Testing Guidelines
+- Test component rendering
+- Test prop variations
+- Test user interactions
+- Test error states
+- Test accessibility
+- Test responsive behavior
+- Test performance impact
+
+## Extension Points
+- Support for custom styling via className and style props
+- Support for composition via children prop
+- Support for ref forwarding when needed
+- Support for custom event handlers
+- Support for theme customization
+- Support for internationalization
+
+<danger>
+- Avoid mixing business logic with UI logic
+- Avoid hardcoding styles or text content
+- Avoid prop drilling beyond 2 levels
+- Avoid complex state management within components
+- Avoid direct DOM manipulation
+</danger>

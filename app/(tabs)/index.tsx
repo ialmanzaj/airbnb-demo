@@ -11,11 +11,7 @@ import PropertyCard, { Property } from '@/components/home/PropertyCard';
 import { init, InstaQLEntity } from '@instantdb/react-native';
 import schema, { AppSchema } from "@/instant.schema";
 import { LegendList } from '@legendapp/list';
-
-// ID for app: airbnb-demo
-const APP_ID = process.env.EXPO_PUBLIC_INSTANT_APP_ID!;
-
-const db = init({ appId: APP_ID, schema });
+import { db } from '@/lib/instant';
 
 // Define the query type for type safety and utility type extraction
 const listingsQuery = {

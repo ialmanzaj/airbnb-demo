@@ -89,6 +89,11 @@ const _schema = i.schema({
       isPrimary: i.boolean(),
       order: i.number(),
     }),
+
+    // Wishlist entries
+    wishlist: i.entity({
+      createdAt: i.date().indexed(),
+    }),
   },
 
   links: {
@@ -156,6 +161,18 @@ const _schema = i.schema({
     reviewBooking: {
       forward: { on: 'reviews', has: 'one', label: 'booking' },
       reverse: { on: 'bookings', has: 'one', label: 'review' },
+    },
+
+    // Wishlist <-> User (many-to-one)
+    wishlistUser: {
+      forward: { on: 'wishlist', has: 'one', label: '$user' },
+      reverse: { on: '$users', has: 'many', label: 'wishlistItems' },
+    },
+
+    // Wishlist <-> Listing (many-to-one)
+    wishlistListing: {
+      forward: { on: 'wishlist', has: 'one', label: 'listing' },
+      reverse: { on: 'listings', has: 'many', label: 'wishlistEntries' },
     },
   },
 });

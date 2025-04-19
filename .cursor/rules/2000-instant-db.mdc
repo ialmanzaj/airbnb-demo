@@ -1,0 +1,227 @@
+---
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+# InstantDB Integration Standards
+
+## Context
+- When implementing InstantDB in React Native applications
+- When managing real-time data synchronization
+- When implementing database operations and queries
+- When setting up complex data relationships
+- When handling user authentication and data management
+
+## Requirements
+
+### Core Setup
+- Initialize InstantDB in `lib/instant.ts`:
+```typescript
+import { init } from "@instantdb/react-native";
+import { id } from "@instantdb/react-native";
+import schema from "@/instant.schema";
+
+if (!process.env.EXPO_PUBLIC_INSTANT_APP_ID) {
+  throw new Error("Missing EXPO_PUBLIC_INSTANT_APP_ID environment variable");
+}
+
+export const db = init({
+  appId: process.env.EXPO_PUBLIC_INSTANT_APP_ID,
+  schema,
+});
+
+export type { AppSchema } from "@/instant.schema";
+```
+
+### CRUD Operations
+
+#### Create Operations
+```typescript
+// Single entity creation
+const entityId = id();
+await db.transact([
+  db.tx.entity[entityId].update({
+    field1: value1,
+    field2: value2,
+    createdAt: new Date().toISOString(),
+  }),
+]);
+
+// Create with relationships
+await db.transact([
+  db.tx.entity[entityId].update({
+    // Entity fields
+  }).link({
+    relatedEntity: relatedId,
+    manyToMany: [id1, id2],
+  }),
+]);
+```
+
+#### Read Operations
+```typescript
+// Basic query
+const { data } = db.useQuery({
+  entity: {
+    $: {
+      where: { field: value },
+      order: { createdAt: "desc" },
+    },
+    id: true,
+    field1: true,
+  },
+});
+
+// Query with relationships
+const { data, isLoading, error } = db.useQuery({
+  entity: {
+    $: {
+      where: { "relatedEntity.field": value },
+    },
+    id: true,
+    relatedEntity: {
+      field1: true,
+      nested: {
+        field2: true,
+      },
+    },
+  },
+});
+```
+
+#### Update Operations
+```typescript
+// Single entity update
+await db.transact([
+  db.tx.entity[entityId].update({
+    field: newValue,
+    updatedAt: new Date().toISOString(),
+  }),
+]);
+
+// Update with relationship changes
+await db.transact([
+  db.tx.entity[entityId].update({
+    field: newValue,
+  }).link({
+    newRelation: newRelationId,
+  }),
+]);
+```
+
+#### Delete Operations
+```typescript
+// Single entity deletion
+await db.transact([
+  db.tx.entity[entityId].delete(),
+]);
+
+// Delete with relationship cleanup
+const { data } = db.useQuery({
+  entity: {
+    $: { where: { id: entityId } },
+    relatedIds: true,
+  },
+});
+await db.transact([
+  // Related entities will be automatically cleaned up
+  db.tx.entity[entityId].delete(),
+]);
+```
+
+### Error Handling
+```typescript
+interface OperationResult {
+  success: boolean;
+  error?: string;
+}
+
+async function safeOperation(): Promise<OperationResult> {
+  try {
+    await db.transact([
+      // Operations
+    ]);
+    return { success: true };
+  } catch (error) {
+    console.error("Operation failed:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Operation failed",
+    };
+  }
+}
+```
+
+### Query Optimization
+- Use selective field querying to minimize data transfer
+- Include proper indexes in schema for frequently queried fields
+- Use limit and skip for pagination
+- Order results server-side when possible
+- Cache frequently accessed data with useQuery
+
+### Type Safety
+```typescript
+// Schema types
+type AppSchema = {
+  entity: {
+    id: string;
+    field1: string;
+    field2: number;
+    relatedEntity?: {
+      id: string;
+    };
+  };
+};
+
+// Type-safe queries
+function useTypedQuery<T extends keyof AppSchema>(
+  entityType: T,
+  where: Partial<AppSchema[T]>
+) {
+  return db.useQuery({
+    [entityType]: {
+      $: { where },
+      id: true,
+      // Type-safe field selection
+    },
+  });
+}
+```
+
+### Relationship Patterns
+```typescript
+// One-to-one relationship
+db.tx.entity[id].link({ related: relatedId });
+
+// One-to-many relationship
+db.tx.entity[id].link({ children: [child1Id, child2Id] });
+
+// Many-to-many relationship
+db.tx.entity[id].link({ tags: tagIds });
+
+// Nested relationship query
+const { data } = db.useQuery({
+  parent: {
+    children: {
+      grandchildren: {
+        field: true,
+      },
+    },
+  },
+});
+```
+
+<critical>
+- NEVER use raw queries without type safety
+- ALWAYS handle errors in mutations with try/catch
+- ENSURE proper cleanup of relationships
+- USE transactions for atomic operations
+- MAINTAIN consistent date formats (ISO strings)
+- IMPLEMENT proper validation before operations
+- HANDLE race conditions in async operations
+- USE proper indexing for queried fields
+- FOLLOW naming conventions for entities and fields
+- TEST queries before implementing in components
+</critical>
+
+<version>2.2.0</version>
