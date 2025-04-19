@@ -94,13 +94,11 @@ export function useWishlistStatus(listingId: string): boolean {
     wishlist: {
       $: {
         where: {
-          "listing.id": listingId,
+          "listing.id": listingId, // Filter by listingId
         },
       },
-      id: true,
     },
   });
-
   return Boolean(data?.wishlist?.length);
 }
 
@@ -111,29 +109,7 @@ export function useWishlistStatus(listingId: string): boolean {
 export function useWishlistEntries() {
   const { data, isLoading, error } = db.useQuery({
     wishlist: {
-      $: {
-        order: { createdAt: "desc" },
-      },
-      id: true,
-      createdAt: true,
-      listing: {
-        id: true,
-        title: true,
-        type: true,
-        status: true,
-        images: {
-          url: true,
-          isPrimary: true,
-        },
-        pricing: {
-          basePrice: true,
-          currency: true,
-        },
-        location: {
-          city: true,
-          state: true,
-        },
-      },
+      listing: {},
     },
   });
 
