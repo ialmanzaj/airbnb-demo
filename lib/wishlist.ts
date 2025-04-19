@@ -45,32 +45,33 @@ export async function addToWishlist(
 }
 
 /**
+ * Hook to get a wishlist entry ID for a listing
+ * @param listingId The ID of the listing to check
+ * @returns Query result containing wishlist entry ID if it exists
+ */
+export function useWishlistEntryId(listingId: string) {
+  return db.useQuery({
+    wishlist: {
+      $: {
+        where: {
+          "listing.id": listingId,
+        },
+      },
+    },
+  });
+}
+
+/**
  * Remove a listing from the current user's wishlist
- * @param listingId The ID of the listing to remove from wishlist
+ * @param wishlistId The ID of the wishlist entry to remove
  */
 export async function removeFromWishlist(
-  listingId: string
+  wishlistId: string
 ): Promise<WishlistOperationResult> {
   try {
-    // First find the wishlist entry for this listing
-    const { data } = db.useQuery({
-      wishlist: {
-        $: {
-          where: {
-            "listing.id": listingId,
-          },
-        },
-        id: true,
-      },
-    });
-
-    if (!data?.wishlist?.[0]?.id) {
-      return { success: true }; // Already not in wishlist
-    }
-
     // Delete the wishlist entry - relationships will be automatically cleaned up
-    await db.transact([db.tx.wishlist[data.wishlist[0].id].delete()]);
-
+    await db.transact([db.tx.wishlist[wishlistId].delete()]);
+    
     return { success: true };
   } catch (error) {
     console.error("Failed to remove from wishlist:", error);
@@ -90,15 +91,7 @@ export async function removeFromWishlist(
  * @returns boolean indicating if the listing is in the wishlist
  */
 export function useWishlistStatus(listingId: string): boolean {
-  const { data } = db.useQuery({
-    wishlist: {
-      $: {
-        where: {
-          "listing.id": listingId, // Filter by listingId
-        },
-      },
-    },
-  });
+  const { data } = useWishlistEntryId(listingId);
   return Boolean(data?.wishlist?.length);
 }
 

@@ -1,0 +1,79 @@
+---
+description: 
+globs: *.tsx
+alwaysApply: false
+---
+ # LegendList Implementation Standard
+
+## Context
+- When implementing any scrollable list in the application
+- When displaying arrays of data in a scrollable format
+- When performance optimization is needed for large lists
+- When implementing grid or column-based lists
+
+## Requirements
+- Use LegendList instead of FlatList or ScrollView for all scrollable lists
+- Always provide estimatedItemSize prop for optimal performance
+- Implement keyExtractor function for unique item identification
+- Use recycleItems prop for memory optimization
+- Handle column layouts using numColumns and columnWrapperStyle
+- Implement proper content container styling
+
+## Examples
+
+<example>
+```tsx
+// ✅ Correct implementation using LegendList
+<LegendList
+  estimatedItemSize={200}
+  data={items}
+  renderItem={renderItem}
+  keyExtractor={(item) => item.id}
+  recycleItems
+  contentContainerStyle={{ paddingBottom: 20 }}
+/>
+```
+
+For grid layouts:
+```tsx
+<LegendList
+  estimatedItemSize={200}
+  data={items}
+  renderItem={renderItem}
+  keyExtractor={(item) => item.id}
+  numColumns={2}
+  columnWrapperStyle={{
+    justifyContent: 'space-between',
+  }}
+  recycleItems
+  contentContainerStyle={{ paddingBottom: 20 }}
+/>
+```
+</example>
+
+<example type="invalid">
+```tsx
+// ❌ Incorrect: Using FlatList instead of LegendList
+<FlatList
+  data={items}
+  renderItem={renderItem}
+  keyExtractor={(item) => item.id}
+/>
+
+// ❌ Incorrect: Missing required props
+<LegendList
+  data={items}
+  renderItem={renderItem}
+/>
+```
+</example>
+
+<critical>
+- NEVER use FlatList or ScrollView for lists
+- ALWAYS provide estimatedItemSize prop
+- ALWAYS implement keyExtractor
+- ALWAYS use recycleItems prop for better performance
+- ENSURE proper typing for data and renderItem props
+</critical>
+
+<version>1.0.0</version>

@@ -11,7 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Colors from '@/constants/colors';
 import Rating from './Rating';
-import { addToWishlist, removeFromWishlist, useWishlistStatus } from '@/lib/wishlist';
+import { addToWishlist, removeFromWishlist, useWishlistStatus, useWishlistEntryId } from '@/lib/wishlist';
 
 export interface PropertyImage {
   id: string;
@@ -82,8 +82,9 @@ const PropertyCard = ({ property, onPress, initialFavorite = false, onFavoriteCh
   const opacity = useSharedValue(1);
 
   // Get wishlist status from InstantDB
-  const wishlistStatus = useWishlistStatus(property.id);
-  const isFavorite = wishlistStatus ?? initialFavorite;
+  const isWishlisted = useWishlistStatus(property.id);
+  const { data: wishlistData } = useWishlistEntryId(property.id);
+  const isFavorite = isWishlisted ?? initialFavorite;
 
   // Animated styles
   const heartStyle = useAnimatedStyle(() => ({
@@ -118,18 +119,15 @@ const PropertyCard = ({ property, onPress, initialFavorite = false, onFavoriteCh
       // Trigger haptic feedback
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-      // Animate heart
-      scale.value = withSequence(
-        withSpring(1.2),
-        withSpring(1)
-      );
-      opacity.value = withTiming(newValue ? 1 : 0.8, { duration: 100 });
 
-      // Update wishlist in database
       if (newValue) {
+
         await addToWishlist(property.id);
       } else {
-        await removeFromWishlist(property.id);
+
+        if (wishlistData?.wishlist?.[0]?.id) {
+          await removeFromWishlist(wishlistData?.wishlist[0].id);
+        }
       }
 
       if (onFavoriteChange) {
@@ -141,6 +139,13 @@ const PropertyCard = ({ property, onPress, initialFavorite = false, onFavoriteCh
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleRemoveFromWishlist = async () => {
+    const wishlistId = wishlistData?.wishlist?.[0]?.id;
+    if (wishlistId) {
+      await removeFromWishlist(wishlistId);
     }
   };
 
@@ -179,14 +184,12 @@ const PropertyCard = ({ property, onPress, initialFavorite = false, onFavoriteCh
           disabled={isUpdating}
           testID="favorite-button"
         >
-          <Animated.View style={heartStyle}>
-            <Heart
-              size={20}
-              color={isFavorite ? Colors.light.primary : 'white'}
-              fill={isFavorite ? Colors.light.primary : 'transparent'}
-              testID="heart-icon"
-            />
-          </Animated.View>
+          <Heart
+            size={20}
+            color={isFavorite ? Colors.light.primary : 'white'}
+            fill={isFavorite ? Colors.light.primary : 'transparent'}
+            testID="heart-icon"
+          />
         </Pressable>
 
         {hasImages && images.length > 1 && (

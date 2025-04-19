@@ -125,8 +125,8 @@
     "allow": {
       "view": "true",
       "create": "true",
-      "update": "auth.id != null && auth.id == data.ref('$user.id')",
-      "delete": "auth.id != null && auth.id == data.ref('$user.id')"
+      "delete": "true",
+      "update": "true"
     }
   },
   "attrs": {
