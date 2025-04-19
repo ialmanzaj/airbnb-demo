@@ -1,0 +1,199 @@
+---
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+
+# React Native Testing Standards
+
+## Test Organization
+- Co-locate test files with source using `.test.{ts,tsx}` extension
+- Place E2E tests in `e2e/` directory using `.spec.{ts,tsx}`
+- Store test utilities in `__tests__/utils/`
+- Organize mock data in `__mocks__/` by feature
+- Maintain minimum 80% code coverage
+
+## Testing Types and Examples
+
+### Unit Testing
+
+#### Components and Hooks
+```typescript
+// Component Test
+describe('Button', () => {
+  const setup = (props = {}) => render(<Button label="Click me" {...props} />);
+
+  it('renders and handles interactions', () => {
+    const onPress = jest.fn();
+    const { getByText } = setup({ onPress });
+    
+    const button = getByText('Click me');
+    expect(button).toBeTruthy();
+    
+    fireEvent.press(button);
+    expect(onPress).toHaveBeenCalled();
+  });
+
+  it('handles states correctly', () => {
+    const { getByTestId } = setup({ disabled: true, variant: 'primary' });
+    expect(getByTestId('button-primary-disabled')).toBeTruthy();
+  });
+});
+
+// Hook Test
+describe('useDataFetching', () => {
+  beforeEach(() => jest.useFakeTimers());
+  afterEach(() => jest.useRealTimers());
+
+  it('manages data lifecycle', async () => {
+    const { result } = renderHook(() => useDataFetching());
+
+    expect(result.current.loading).toBe(true);
+
+    await act(async () => {
+      await result.current.fetchData();
+      jest.runAllTimers();
+    });
+
+    expect(result.current.data).toBeDefined();
+    expect(result.current.loading).toBe(false);
+  });
+});
+```
+
+Key Points:
+- Test rendering and interactions
+- Verify state changes and lifecycle
+- Mock external dependencies
+- Test error boundaries
+- Validate accessibility
+- Test effect cleanup
+- Check performance optimizations
+
+### Integration Testing
+```typescript
+describe('LoginFlow', () => {
+  const mockApi = {
+    login: jest.fn(),
+    validateSession: jest.fn(),
+  };
+
+  it('handles complete login flow', async () => {
+    const { getByTestId, findByText } = render(
+      <AppProvider api={mockApi}>
+        <LoginScreen />
+      </AppProvider>
+    );
+
+    // Input credentials
+    fireEvent.changeText(getByTestId('email'), 'test@example.com');
+    fireEvent.changeText(getByTestId('password'), 'password123');
+    
+    // Submit
+    mockApi.login.mockResolvedValueOnce({ token: 'test-token' });
+    fireEvent.press(getByTestId('submit'));
+
+    // Verify success
+    expect(await findByText('Welcome')).toBeTruthy();
+    expect(mockApi.validateSession).toHaveBeenCalledWith('test-token');
+  });
+
+  it('handles errors gracefully', async () => {
+    mockApi.login.mockRejectedValueOnce(new Error('Invalid credentials'));
+    // ... test error handling
+  });
+});
+```
+
+Key Points:
+- Test component interactions
+- Verify data flow
+- Test navigation
+- Handle async operations
+- Mock API responses
+- Test error scenarios
+- Validate state management
+
+### E2E Testing
+```yaml
+# login_flow.spec.yaml
+appId: com.myapp
+---
+- launchApp
+- assertVisible: "Login"
+- tapOn:
+    id: "email-input"
+- inputText: "test@example.com"
+- tapOn:
+    id: "password-input"
+- inputText: "password123"
+- tapOn:
+    id: "login-button"
+- assertVisible: "Welcome"
+- tapOn:
+    id: "profile-tab"
+- assertVisible: "Profile"
+```
+
+Key Points:
+- Test full user flows
+- Verify app state
+- Test offline modes
+- Check data persistence
+- Validate navigation
+- Test real API integration
+
+## Best Practices
+
+### Test Structure
+```typescript
+describe('ComponentName', () => {
+  // Setup/Teardown
+  beforeAll(() => {
+    // Global setup
+  });
+
+  beforeEach(() => {
+    // Per-test setup
+    jest.clearAllMocks();
+  });
+
+  // Group related tests
+  describe('specific behavior', () => {
+    it('should behave as expected', () => {
+      // Arrange
+      const props = {};
+
+      // Act
+      const result = action();
+
+      // Assert
+      expect(result).toBe(expected);
+    });
+  });
+});
+```
+
+### Common Patterns
+- Use data-testid for queries: `{component}-{element}-{state}`
+- Mock timers for async: `jest.useFakeTimers()`
+- Mock fetch/HTTP: `jest.spyOn(global, 'fetch')`
+- Test loading states: `expect(loading).toBe(true)`
+- Test error states: `expect(error).toBeTruthy()`
+- Test empty states: `expect(list).toHaveLength(0)`
+
+## Critical Testing Checklist
+<critical>
+- WRITE tests first (TDD when possible)
+- MAINTAIN test isolation
+- MOCK external dependencies
+- USE descriptive test names
+- FOLLOW AAA pattern
+- CLEAN UP after tests
+- TEST edge cases
+- VERIFY error handling
+- CHECK accessibility
+- AVOID implementation details
+</critical>
+
+<version>1.0.0</version> 

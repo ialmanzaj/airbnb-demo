@@ -1,27 +1,30 @@
-import React from 'react';
-import {
-  useWishlistEntryId,
-  toggleWishlist
-} from '@/lib/wishlist';
+import React, { useEffect } from 'react';
 import FavoriteButton from '@/components/FavoriteButton';
+import { useWishlistFavorite } from '@/hooks/useWishlistFavorite';
 
 interface WishlistFavoriteButtonProps {
   propertyId: string;
+  onError?: (error: Error) => void;
 }
 
-export const WishlistFavoriteButton: React.FC<WishlistFavoriteButtonProps> = ({ propertyId }) => {
-  const { data: wishlistStatus, isLoading } = useWishlistEntryId(propertyId);
-  const wishlistId = wishlistStatus?.wishlist?.[0]?.id;
+export const WishlistFavoriteButton: React.FC<WishlistFavoriteButtonProps> = ({
+  propertyId,
+  onError
+}) => {
+  const { isFavorite, isLoading, handleToggle, error } = useWishlistFavorite(propertyId);
 
-  const handleToggleWishlist = async () => {
-    await toggleWishlist(propertyId, wishlistId);
-  };
+  useEffect(() => {
+    if (error && onError) {
+      onError(error);
+    }
+  }, [error, onError]);
 
   return (
     <FavoriteButton
-      isFavorite={Boolean(wishlistStatus?.wishlist?.length)}
+      isFavorite={isFavorite}
       isLoading={isLoading}
-      onPress={handleToggleWishlist}
+      onPress={handleToggle}
+      testID="wishlist-favorite-button"
     />
   );
 };
