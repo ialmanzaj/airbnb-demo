@@ -3,7 +3,7 @@ import { Pressable } from 'react-native';
 import { Heart } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/colors';
-import { addToWishlist, removeFromWishlist, useWishlistStatus, useWishlistEntryId } from '@/lib/wishlist';
+import { addToWishlist, removeFromWishlist, useWishlistStatus, useWishlistEntryId } from '@/crud/wishlist';
 
 interface FavoriteButtonProps {
   propertyId: string;

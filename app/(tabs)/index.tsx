@@ -11,7 +11,7 @@ import PropertyCard, { Property } from '@/components/home/PropertyCard';
 import { init, InstaQLEntity } from '@instantdb/react-native';
 import schema, { AppSchema } from "@/instant.schema";
 import { LegendList } from '@legendapp/list';
-import { db } from '@/lib/instant';
+import { db } from '@/crud/instant';
 
 // Define the query type for type safety and utility type extraction
 const listingsQuery = {

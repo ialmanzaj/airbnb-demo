@@ -1,4 +1,4 @@
-import { db, type AppSchema } from "@/lib/instant";
+import { db, type AppSchema } from "@/crud/instant";
 import { id } from "@instantdb/react-native";
 
 // Types

@@ -121,8 +121,8 @@ Users will be able to add a property listing to their wishlist by pressing a hea
    - Add proper error handling and type safety
    - Example implementation:
      ```typescript
-     import { db } from '@/lib/instant';
-     import type { AppSchema } from '@/lib/instant';
+     import { db } from '@/crud/instant';
+     import type { AppSchema } from '@/crud/instant';
 
      interface WishlistEntry {
        id: string;
