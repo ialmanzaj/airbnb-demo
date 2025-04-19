@@ -1,0 +1,59 @@
+---
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+ # Import Path Standards
+
+## Context
+- When importing local modules, components, or utilities
+- When refactoring or moving files between directories
+- When creating new files that need to import existing code
+- When maintaining consistent import paths across the project
+
+## Requirements
+- Use `@/` alias for all local imports
+- Never use relative paths (../../../) for imports
+- Keep imports organized by type (React, external, local)
+- Maintain consistent import order
+- Use explicit file extensions for non-TypeScript/JavaScript files
+
+## Examples
+
+<example>
+```typescript
+// ✅ Good: Using @/ alias for local imports
+import Colors from '@/constants/colors';
+import { Button } from '@/components/ui';
+import { useAuth } from '@/hooks/auth';
+import type { User } from '@/types';
+
+// Good import organization
+import React from 'react';  // React imports first
+import { View } from 'react-native';  // External imports second
+import { format } from 'date-fns';  // Third-party utilities third
+import Colors from '@/constants/colors';  // Local imports last
+```
+</example>
+
+<example type="invalid">
+```typescript
+// ❌ Bad: Using relative paths
+import Colors from '../../../constants/colors';
+import { Button } from './components/Button';
+import { useAuth } from '../../../../hooks/auth';
+
+// Bad: Mixed import styles
+import Colors from '@/constants/colors';
+import { Button } from '../components/Button';  // Inconsistent
+```
+</example>
+
+<critical>
+- NEVER use relative paths for imports
+- ALWAYS use @/ alias for local imports
+- ENSURE proper tsconfig.json/jsconfig.json configuration for path aliases
+- MAINTAIN consistent import organization
+</critical>
+
+<version>1.0.0</version>
