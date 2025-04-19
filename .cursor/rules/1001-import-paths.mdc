@@ -1,7 +1,7 @@
 ----
--description: 
--globs: *.tsx,*.ts
--alwaysApply: false
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
 ----
 # Import Path Standards
 
