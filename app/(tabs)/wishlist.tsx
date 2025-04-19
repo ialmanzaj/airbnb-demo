@@ -1,15 +1,13 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import Colors from '@/constants/colors';
 
 export default function WishlistScreen() {
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.content}>
-                <Text style={styles.title}>Wishlist</Text>
-                <Text style={styles.description}>
+        <SafeAreaView className={styles.container}>
+            <View className={styles.content}>
+                <Text className={styles.title}>Wishlist</Text>
+                <Text className={styles.description}>
                     This would be the wishlist screen where saved properties appear.
                 </Text>
             </View>
@@ -17,26 +15,18 @@ export default function WishlistScreen() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: Colors.light.background,
-    },
-    content: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: Colors.light.text,
-        marginBottom: 12,
-    },
-    description: {
-        fontSize: 16,
-        color: Colors.light.lightText,
-        textAlign: 'center',
-    },
-});
+// Organized styles following the pattern:
+// 1. Layout styles
+// 2. Visual styles
+// 3. Typography styles
+const styles = {
+    // Layout and visual styles
+    container: 'flex-1 bg-white',
+    
+    // Layout styles
+    content: 'flex-1 items-center justify-center px-5 py-5',
+    
+    // Typography styles
+    title: 'text-2xl font-bold text-gray-900 mb-3',
+    description: 'text-base text-gray-500 text-center',
+};
