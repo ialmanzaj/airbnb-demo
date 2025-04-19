@@ -1,90 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Pressable, Text, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import { Sliders } from 'lucide-react-native';
+import { LegendList } from '@legendapp/list';
 
 import Colors from '@/constants/colors';
 import SearchBar from '@/components/home/SearchBar';
 import FilterBar from '@/components/home/FilterBar';
-import PropertyCard, { Property } from '@/components/home/PropertyCard';
-import { InstaQLEntity } from '@instantdb/react-native';
-import { AppSchema } from "@/lib/db";
-import { LegendList } from '@legendapp/list';
-import { db } from '@/lib/db';
-
-// Define the query type for type safety and utility type extraction
-const listingsQuery = {
-  listings: {
-    images: {},
-    location: {},
-    pricing: {},
-  },
-}; // Add satisfies for type checking
-
-// Define the type for a single listing based on the query
-type ListingWithDetails = InstaQLEntity<
-  AppSchema,
-  'listings',
-  typeof listingsQuery['listings']
->;
+import PropertyCard from '@/components/home/PropertyCard';
+import { Property } from '@/types/listing';
+import { useListings } from '@/hooks/useListings';
 
 export default function HomeScreen() {
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Use the defined query
-  const { isLoading, error, data } = db.useQuery(listingsQuery);
+  const { listings, isLoading, error, totalCount } = useListings(searchQuery);
 
-  // Use the correct type
-  const listings: ListingWithDetails[] = data?.listings || [];
-
-  // Map ListingWithDetails to Property type
-  const mapListingToProperty = (listing: ListingWithDetails): Property => {
-    return {
-      id: listing.id,
-      status: listing.status || 'active',
-      createdAt: listing.createdAt,
-      updatedAt: listing.updatedAt,
-      title: listing.title,
-      description: listing.description,
-      type: listing.type,
-      slug: listing.slug,
-      maxGuests: listing.maxGuests,
-      bedrooms: listing.bedrooms,
-      beds: listing.beds,
-      baths: listing.baths,
-      rating: listing.rating,
-      images: listing.images?.map(img => ({
-        id: img.id,
-        url: img.url,
-        caption: img.caption || '',
-        isPrimary: img.isPrimary || false,
-        order: img.order || 0
-      })) || [],
-      location: listing.location,
-      pricing: listing.pricing
-    };
-  };
-
-  // Update the type for the pressed item
-  const handlePropertyPress = (property: Property) => {
+  const handlePropertyPress = useCallback((property: Property) => {
     Alert.alert(
       property.title,
       `You selected ${property.title} in ${property.location?.city}. This would navigate to a property details screen.`
     );
-  };
+  }, []);
 
-  // Update the item type in renderItem
-  const renderItem = ({ item }: { item: ListingWithDetails }) => {
-    const property = mapListingToProperty(item);
+  const renderItem = useCallback(({ item }: { item: Property }) => {
     return (
       <PropertyCard
-        property={property}
+        property={item}
         onPress={handlePropertyPress}
       />
     );
-  };
+  }, [handlePropertyPress]);
+
+  if (error) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-red-500">Error loading listings</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView className={styles.container} edges={['top', 'bottom']}>
@@ -104,7 +60,7 @@ export default function HomeScreen() {
       <View className={styles.listContainer}>
         <View className={styles.listHeader}>
           <Text style={{ color: Colors.light.text }} className={styles.resultsText}>
-            {listings?.length} homes
+            {totalCount} homes
           </Text>
 
           <Pressable

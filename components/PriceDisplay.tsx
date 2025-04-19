@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import Colors from '@/constants/colors';
-import { PropertyPricing } from '@/components/home/PropertyCard';
+import { PropertyPricing } from '@/types/listing';
 
 interface PriceDisplayProps {
   pricing?: PropertyPricing;

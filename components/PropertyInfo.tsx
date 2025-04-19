@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import Colors from '@/constants/colors';
 import Rating from '@/components/home/Rating';
-import { PropertyLocation } from '@/components/home/PropertyCard';
+import { PropertyLocation } from '@/types/listing';
 
 interface PropertyInfoProps {
   title: string;
