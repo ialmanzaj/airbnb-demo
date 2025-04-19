@@ -112,7 +112,7 @@ Users will be able to add a property listing to their wishlist by pressing a hea
 
 ### 5.1 Phases
 1. **Phase 1: Schema Update**
-   - Update InstantDB schema in `instant.schema.ts` to include wishlist entity and relationships
+   - Update InstantDB schema in `@/lib/db` to include wishlist entity and relationships
    - Implement type-safe interfaces for wishlist operations
    - Add wishlist-related types to AppSchema
 2. **Phase 2: Data Access Layer**
@@ -121,8 +121,8 @@ Users will be able to add a property listing to their wishlist by pressing a hea
    - Add proper error handling and type safety
    - Example implementation:
      ```typescript
-     import { db } from '@/crud/instant';
-     import type { AppSchema } from '@/crud/instant';
+     import { db } from '@/lib/db';
+     import type { AppSchema } from '@/lib/db';
 
      interface WishlistEntry {
        id: string;

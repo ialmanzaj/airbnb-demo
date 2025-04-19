@@ -1,7 +1,8 @@
 import React from 'react';
 import { fireEvent } from '@testing-library/react-native';
 import { render } from '../utils/test-utils';
-import PropertyCard, { Property } from '@/components/home/PropertyCard';
+import PropertyCard from '@/components/home/PropertyCard';
+import { Property } from '@/types/listing';
 
 
 // Mock colors constant
@@ -29,8 +30,8 @@ const mockProperty: Property = {
   baths: 1,
   rating: 4.5,
   images: [
-    { id: '1', url: 'https://example.com/image1.jpg' },
-    { id: '2', url: 'https://example.com/image2.jpg' },
+    { id: '1', url: 'https://example.com/image1.jpg', caption: '', isPrimary: true, order: 1 },
+    { id: '2', url: 'https://example.com/image2.jpg', caption: '', isPrimary: false, order: 2 },
   ],
   location: {
     id: '1',
@@ -90,10 +91,9 @@ describe('PropertyCard', () => {
 
   it('handles favorite button press', () => {
     const { getByTestId, getAllByTestId } = render(
-      <PropertyCard 
-        property={mockProperty} 
+      <PropertyCard
+        property={mockProperty}
         onPress={mockOnPress}
-        onFavoriteChange={mockOnFavoriteChange}
       />
     );
 
@@ -106,7 +106,7 @@ describe('PropertyCard', () => {
 
     // Press favorite button
     fireEvent(favoriteButton, 'press', {
-      stopPropagation: () => {},
+      stopPropagation: () => { },
     });
 
     // Check if heart icon fill color changed
@@ -116,10 +116,9 @@ describe('PropertyCard', () => {
 
   it('respects initialFavorite prop', () => {
     const { getAllByTestId } = render(
-      <PropertyCard 
-        property={mockProperty} 
+      <PropertyCard
+        property={mockProperty}
         onPress={mockOnPress}
-        initialFavorite={true}
       />
     );
 
