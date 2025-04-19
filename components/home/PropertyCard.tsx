@@ -4,6 +4,7 @@ import ImageCarousel from '@/components/ImageCarousel';
 import FavoriteButton from '@/components/FavoriteButton';
 import PropertyInfo from '@/components/PropertyInfo';
 import PriceDisplay from '@/components/PriceDisplay';
+import { WishlistFavoriteButton } from '../WishlistFavoriteButton';
 
 export interface PropertyImage {
   id: string;
@@ -76,10 +77,8 @@ const PropertyCard = ({ property, onPress, initialFavorite = false, onFavoriteCh
           images={property.images || []}
           height={cardWidth * 1.1}
         />
-        <FavoriteButton
+        <WishlistFavoriteButton
           propertyId={property.id}
-          initialFavorite={initialFavorite}
-          onFavoriteChange={onFavoriteChange}
         />
       </View>
 

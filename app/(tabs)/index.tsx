@@ -8,10 +8,10 @@ import Colors from '@/constants/colors';
 import SearchBar from '@/components/home/SearchBar';
 import FilterBar from '@/components/home/FilterBar';
 import PropertyCard, { Property } from '@/components/home/PropertyCard';
-import { init, InstaQLEntity } from '@instantdb/react-native';
-import schema, { AppSchema } from "@/instant.schema";
+import { InstaQLEntity } from '@instantdb/react-native';
+import { AppSchema } from "@/lib/db";
 import { LegendList } from '@legendapp/list';
-import { db } from '@/crud/instant';
+import { db } from '@/lib/db';
 
 // Define the query type for type safety and utility type extraction
 const listingsQuery = {
@@ -98,7 +98,7 @@ export default function HomeScreen() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
-      
+
       <FilterBar />
 
       <View className={styles.listContainer}>
