@@ -1,227 +1,312 @@
----
+----
 description: 
 globs: *.tsx,*.ts
 alwaysApply: false
----
-# InstantDB Integration Standards
+----
+# InstantDB CRUD Operation Patterns
 
 ## Context
-- When implementing InstantDB in React Native applications
-- When managing real-time data synchronization
-- When implementing database operations and queries
-- When setting up complex data relationships
-- When handling user authentication and data management
+- When writing database queries and mutations
+- When implementing real-time data operations
+- When handling relationships between entities
+- When optimizing query performance
+- When implementing error handling
+- When managing schema migrations
+- When handling concurrent updates
+- When implementing batch operations
 
 ## Requirements
 
-### Core Setup
-- Initialize InstantDB in `lib/instant.ts`:
+### Query Decision Tree
+- Use single query when:
+  - Data is shallow (1-2 levels deep)
+  - All fields are needed immediately
+  - Real-time updates required
+
+- Split into multiple queries when:
+  - Deep nested relationships (>2 levels)
+  - Partial data loading needed
+  - Different update frequencies
+  - Performance optimization needed
+
+### Mutation Decision Tree
+- Use single transaction when:
+  - Operations must be atomic
+  - Related entities need sync
+  - Rollback required on failure
+
+- Use separate mutations when:
+  - Operations can be independent
+  - Optimistic updates needed
+  - Different error handling required
+
+### Examples
+
+<example>
 ```typescript
-import { init } from "@instantdb/react-native";
-import { id } from "@instantdb/react-native";
-import schema from "@/instant.schema";
-
-if (!process.env.EXPO_PUBLIC_INSTANT_APP_ID) {
-  throw new Error("Missing EXPO_PUBLIC_INSTANT_APP_ID environment variable");
-}
-
-export const db = init({
-  appId: process.env.EXPO_PUBLIC_INSTANT_APP_ID,
-  schema,
-});
-
-export type { AppSchema } from "@/instant.schema";
-```
-
-### CRUD Operations
-
-#### Create Operations
-```typescript
-// Single entity creation
-const entityId = id();
-await db.transact([
-  db.tx.entity[entityId].update({
-    field1: value1,
-    field2: value2,
-    createdAt: new Date().toISOString(),
-  }),
-]);
-
-// Create with relationships
-await db.transact([
-  db.tx.entity[entityId].update({
-    // Entity fields
-  }).link({
-    relatedEntity: relatedId,
-    manyToMany: [id1, id2],
-  }),
-]);
-```
-
-#### Read Operations
-```typescript
-// Basic query
+// Good: Single query for shallow data
 const { data } = db.useQuery({
-  entity: {
-    $: {
-      where: { field: value },
+  listings: {
+    $: { 
+      where: { status: "active" },
       order: { createdAt: "desc" },
-    },
-    id: true,
-    field1: true,
-  },
+      limit: 10
+    }
+  }
 });
 
-// Query with relationships
-const { data, isLoading, error } = db.useQuery({
-  entity: {
-    $: {
-      where: { "relatedEntity.field": value },
-    },
-    id: true,
-    relatedEntity: {
-      field1: true,
-      nested: {
-        field2: true,
-      },
-    },
-  },
+// Good: Split queries for different update frequencies
+const { data: basicInfo } = db.useQuery({
+  profile: {
+    $: { where: { userId } }
+  }
 });
-```
 
-#### Update Operations
-```typescript
-// Single entity update
-await db.transact([
-  db.tx.entity[entityId].update({
-    field: newValue,
-    updatedAt: new Date().toISOString(),
-  }),
-]);
+const { data: stats } = db.useQuery({
+  profileStats: {
+    $: { where: { userId } }
+  }
+});
 
-// Update with relationship changes
+// Good: Atomic transaction for related updates
 await db.transact([
-  db.tx.entity[entityId].update({
-    field: newValue,
-  }).link({
-    newRelation: newRelationId,
-  }),
+  db.tx.booking[bookingId].update({ status: "confirmed" }),
+  db.tx.listing[listingId].update({ availability: "booked" }),
+  (result) => db.tx.notification.create({ 
+    type: "booking_confirmed",
+    bookingId: result.id 
+  })
 ]);
 ```
+</example>
 
-#### Delete Operations
+<example type="invalid">
 ```typescript
-// Single entity deletion
-await db.transact([
-  db.tx.entity[entityId].delete(),
-]);
-
-// Delete with relationship cleanup
+// Bad: Redundant field declarations
 const { data } = db.useQuery({
-  entity: {
-    $: { where: { id: entityId } },
-    relatedIds: true,
-  },
+  users: {
+    $: { where: { status: "active" } },
+    name: true,    // Redundant
+    email: true,   // Redundant
+    profile: true  // Redundant
+  }
 });
-await db.transact([
-  // Related entities will be automatically cleaned up
-  db.tx.entity[entityId].delete(),
-]);
-```
 
-### Error Handling
+// Bad: Single deep query causing performance issues
+const { data } = db.useQuery({
+  users: {
+    profile: {
+      posts: {
+        comments: {
+          author: {
+            profile: {} // Even empty object is not needed
+          }
+        }
+      }
+    }
+  }
+});
+
+// Bad: Separate transactions that should be atomic
+await db.tx.booking[id].update({ status: "confirmed" });
+await db.tx.listing[id].update({ availability: "booked" });
+await db.tx.notification.create({ type: "booking_confirmed" });
+```
+</example>
+
+### Performance Patterns
+
+<example>
 ```typescript
-interface OperationResult {
-  success: boolean;
-  error?: string;
+// Good: Optimized query with pagination
+function usePagedData(page: number) {
+  return db.useQuery({
+    items: {
+      $: {
+        where: { status: "active" },
+        limit: 20,
+        skip: page * 20,
+        order: { createdAt: "desc" }
+      }
+    }
+  });
 }
 
-async function safeOperation(): Promise<OperationResult> {
+// Good: Optimistic update with error handling
+async function toggleFavorite(itemId: string) {
   try {
+    // Optimistic update in UI
+    setFavorited(prev => !prev);
+    
     await db.transact([
-      // Operations
+      db.tx.favorites.create({
+        itemId,
+        userId: currentUser,
+        createdAt: new Date().toISOString()
+      })
     ]);
-    return { success: true };
   } catch (error) {
-    console.error("Operation failed:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Operation failed",
-    };
+    // Revert optimistic update
+    setFavorited(prev => !prev);
+    throw error;
   }
 }
 ```
+</example>
 
-### Query Optimization
-- Use selective field querying to minimize data transfer
-- Include proper indexes in schema for frequently queried fields
-- Use limit and skip for pagination
-- Order results server-side when possible
-- Cache frequently accessed data with useQuery
+### Error Handling and Validation
 
-### Type Safety
+<example>
 ```typescript
-// Schema types
-type AppSchema = {
-  entity: {
-    id: string;
-    field1: string;
-    field2: number;
-    relatedEntity?: {
-      id: string;
-    };
-  };
-};
-
-// Type-safe queries
-function useTypedQuery<T extends keyof AppSchema>(
-  entityType: T,
-  where: Partial<AppSchema[T]>
-) {
-  return db.useQuery({
-    [entityType]: {
-      $: { where },
-      id: true,
-      // Type-safe field selection
-    },
-  });
+// Good: Comprehensive error handling
+async function createListing(data: ListingData) {
+  try {
+    const result = await db.transact(
+      db.tx.listings[id()].update(data)
+    );
+    return { success: true, data: result };
+  } catch (error) {
+    if (error.code === 'VALIDATION_ERROR') {
+      return { success: false, error: 'Invalid listing data' };
+    } else if (error.code === 'NETWORK_ERROR') {
+      return { success: false, error: 'Connection issues' };
+    }
+    return { success: false, error: 'Unknown error' };
+  }
 }
-```
 
-### Relationship Patterns
-```typescript
-// One-to-one relationship
-db.tx.entity[id].link({ related: relatedId });
-
-// One-to-many relationship
-db.tx.entity[id].link({ children: [child1Id, child2Id] });
-
-// Many-to-many relationship
-db.tx.entity[id].link({ tags: tagIds });
-
-// Nested relationship query
-const { data } = db.useQuery({
-  parent: {
-    children: {
-      grandchildren: {
-        field: true,
-      },
-    },
-  },
+// Good: Schema validation
+const schema = i.schema({
+  version: '1.0.0',
+  entities: {
+    listings: i.entity({
+      title: i.string().required().min(3).max(100),
+      price: i.number().required().min(0),
+      description: i.string().max(1000),
+      validate: (data) => {
+        if (data.price === 0 && !data.isFree) {
+          throw new Error('Free listings must be marked as free');
+        }
+      }
+    })
+  }
 });
 ```
+</example>
+
+### Batch Operations
+
+<example>
+```typescript
+// Good: Batch operations with progress tracking
+async function importListings(listings: ListingData[]) {
+  const batchSize = 100;
+  const batches = [];
+  let processed = 0;
+
+  // Create batches
+  for (let i = 0; i < listings.length; i += batchSize) {
+    batches.push(listings.slice(i, i + batchSize));
+  }
+
+  // Process batches
+  for (const batch of batches) {
+    try {
+      await db.transact(
+        batch.map(listing => 
+          db.tx.listings[id()].update(listing)
+        )
+      );
+      processed += batch.length;
+      onProgress?.(processed / listings.length);
+    } catch (error) {
+      console.error(`Batch failed at ${processed} items`);
+      throw error;
+    }
+  }
+}
+```
+</example>
+
+### Real-time Subscriptions
+
+<example>
+```typescript
+// Good: Real-time data handling with cleanup
+function useRealtimeListing(listingId: string) {
+  const { data, isLoading } = db.useQuery({
+    listings: { 
+      $: { where: { id: listingId } }
+    }
+  });
+
+  useEffect(() => {
+    const unsubscribe = db.subscribe(
+      { listings: { id: listingId } },
+      (updates) => {
+        // Handle real-time updates
+        if (updates.type === 'update') {
+          handleListingUpdate(updates.data);
+        } else if (updates.type === 'delete') {
+          handleListingDeletion();
+        }
+      }
+    );
+
+    return () => unsubscribe();
+  }, [listingId]);
+
+  return { listing: data?.listings?.[0], isLoading };
+}
+```
+</example>
+
+### Conflict Resolution
+
+<example>
+```typescript
+// Good: Handling concurrent updates
+async function updateListingWithLock(listingId: string, updates: any) {
+  const { version } = await db.query({
+    listings: { 
+      $: { where: { id: listingId } },
+      select: ['version']
+    }
+  });
+
+  try {
+    await db.transact(
+      db.tx.listings[listingId]
+        .merge(updates)
+        .where({ version }) // Optimistic locking
+    );
+  } catch (error) {
+    if (error.code === 'CONFLICT') {
+      const current = await db.query({
+        listings: { $: { where: { id: listingId } } }
+      });
+      const merged = mergeStrategy(updates, current);
+      return updateListingWithLock(listingId, merged);
+    }
+    throw error;
+  }
+}
+```
+</example>
 
 <critical>
-- NEVER use raw queries without type safety
-- ALWAYS handle errors in mutations with try/catch
-- ENSURE proper cleanup of relationships
-- USE transactions for atomic operations
-- MAINTAIN consistent date formats (ISO strings)
-- IMPLEMENT proper validation before operations
-- HANDLE race conditions in async operations
-- USE proper indexing for queried fields
-- FOLLOW naming conventions for entities and fields
-- TEST queries before implementing in components
+- NEVER add redundant field declarations (field: true)
+- CHOOSE single query for shallow, real-time data
+- SPLIT queries for deep relationships or different update frequencies
+- USE transactions for related entity updates
+- IMPLEMENT optimistic updates for better UX
+- HANDLE errors with proper rollback
+- OPTIMIZE queries with pagination
+- IMPLEMENT proper cleanup for subscriptions
+- USE batch operations for bulk updates
+- HANDLE concurrent updates with version control
+- VALIDATE data at schema level
+- IMPLEMENT comprehensive error handling
 </critical>
 
-<version>2.2.0</version>
+<version>2.6.0</version> 

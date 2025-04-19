@@ -1,9 +1,9 @@
----
-description: 
-globs: *.tsx,*.ts
-alwaysApply: false
----
- # Import Path Standards
+----
+-description: 
+-globs: *.tsx,*.ts
+-alwaysApply: false
+----
+# Import Path Standards
 
 ## Context
 - When importing local modules, components, or utilities
@@ -56,4 +56,4 @@ import { Button } from '../components/Button';  // Inconsistent
 - MAINTAIN consistent import organization
 </critical>
 
-<version>1.0.0</version>
+<version>1.1.1</version> 

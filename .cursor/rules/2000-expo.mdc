@@ -3,7 +3,7 @@ description:
 globs: *.tsx,*.ts
 alwaysApply: false
 ---
- # Expo Development Standards
+# Expo Development Standards
 
 ## Context
 - When developing React Native applications using Expo
@@ -154,4 +154,4 @@ async function fetchUserData(userId: string) {
     }
   }
 }
-</example>
+</example> 
