@@ -1,14 +1,5 @@
-import { db, type AppSchema } from "@/crud/instant";
+import { db } from "@/lib/db";
 import { id } from "@instantdb/react-native";
-
-// Types
-interface WishlistEntry {
-  id: string;
-  createdAt: Date;
-  listing?: {
-    id: string;
-  };
-}
 
 interface WishlistOperationResult {
   success: boolean;
@@ -71,7 +62,7 @@ export async function removeFromWishlist(
   try {
     // Delete the wishlist entry - relationships will be automatically cleaned up
     await db.transact([db.tx.wishlist[wishlistId].delete()]);
-    
+
     return { success: true };
   } catch (error) {
     console.error("Failed to remove from wishlist:", error);
@@ -90,7 +81,7 @@ export async function removeFromWishlist(
  * @param listingId The ID of the listing to check
  * @returns boolean indicating if the listing is in the wishlist
  */
-export function useWishlistStatus(listingId: string): boolean {
+export function useWishlistExists(listingId: string): boolean {
   const { data } = useWishlistEntryId(listingId);
   return Boolean(data?.wishlist?.length);
 }
@@ -111,4 +102,28 @@ export function useWishlistEntries() {
     isLoading,
     error,
   };
+}
+
+/**
+ * Toggle the wishlist status for a listing
+ * @param propertyId The ID of the listing to toggle
+ * @param wishlistId Optional ID of existing wishlist entry
+ */
+export async function toggleWishlist(
+  propertyId: string,
+  wishlistId?: string
+): Promise<WishlistOperationResult> {
+  try {
+    if (wishlistId) {
+      return await removeFromWishlist(wishlistId);
+    } else {
+      return await addToWishlist(propertyId);
+    }
+  } catch (error) {
+    console.error("Error toggling wishlist:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to toggle wishlist",
+    };
+  }
 }

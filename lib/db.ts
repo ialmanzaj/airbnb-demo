@@ -1,6 +1,7 @@
-// instant.schema.ts
-import { i } from '@instantdb/react';
+import { init } from "@instantdb/react-native";
+import { i } from "@instantdb/react";
 
+// instant.schema.ts
 const _schema = i.schema({
   entities: {
     // Built-in users table - can only use default fields
@@ -100,80 +101,90 @@ const _schema = i.schema({
   links: {
     // Profile <-> User (one-to-one)
     profileUser: {
-      forward: { on: 'profiles', has: 'one', label: '$user' },
-      reverse: { on: '$users', has: 'one', label: 'profile' },
+      forward: { on: "profiles", has: "one", label: "$user" },
+      reverse: { on: "$users", has: "one", label: "profile" },
     },
 
     // Listing <-> Host (one-to-one)
     listingHost: {
-      forward: { on: 'listings', has: 'one', label: 'host' },
-      reverse: { on: '$users', has: 'many', label: 'listings' },
+      forward: { on: "listings", has: "one", label: "host" },
+      reverse: { on: "$users", has: "many", label: "listings" },
     },
 
     // Listing <-> Location (one-to-one)
     listingLocation: {
-      forward: { on: 'listings', has: 'one', label: 'location', onDelete: 'cascade' },
-      reverse: { on: 'locations', has: 'one', label: 'listing' },
+      forward: {
+        on: "listings",
+        has: "one",
+        label: "location",
+        onDelete: "cascade",
+      },
+      reverse: { on: "locations", has: "one", label: "listing" },
     },
 
     // Listing <-> Pricing (one-to-one)
     listingPricing: {
-      forward: { on: 'listings', has: 'one', label: 'pricing', onDelete: 'cascade' },
-      reverse: { on: 'pricing', has: 'one', label: 'listing' },
+      forward: {
+        on: "listings",
+        has: "one",
+        label: "pricing",
+        onDelete: "cascade",
+      },
+      reverse: { on: "pricing", has: "one", label: "listing" },
     },
 
     // Listing <-> Amenities (many-to-many)
     listingAmenities: {
-      forward: { on: 'listings', has: 'many', label: 'amenities' },
-      reverse: { on: 'amenities', has: 'many', label: 'listings' },
+      forward: { on: "listings", has: "many", label: "amenities" },
+      reverse: { on: "amenities", has: "many", label: "listings" },
     },
 
     // Listing <-> Images (one-to-many)
     listingImages: {
-      forward: { on: 'listings', has: 'many', label: 'images' },
-      reverse: { on: 'images', has: 'one', label: 'listing' },
+      forward: { on: "listings", has: "many", label: "images" },
+      reverse: { on: "images", has: "one", label: "listing" },
     },
 
     // Booking <-> Listing (many-to-one)
     bookingListing: {
-      forward: { on: 'bookings', has: 'one', label: 'listing' },
-      reverse: { on: 'listings', has: 'many', label: 'bookings' },
+      forward: { on: "bookings", has: "one", label: "listing" },
+      reverse: { on: "listings", has: "many", label: "bookings" },
     },
 
     // Booking <-> Guest (many-to-one)
     bookingGuest: {
-      forward: { on: 'bookings', has: 'one', label: 'guest' },
-      reverse: { on: '$users', has: 'many', label: 'bookings' },
+      forward: { on: "bookings", has: "one", label: "guest" },
+      reverse: { on: "$users", has: "many", label: "bookings" },
     },
 
     // Review <-> Author (many-to-one)
     reviewAuthor: {
-      forward: { on: 'reviews', has: 'one', label: 'author' },
-      reverse: { on: '$users', has: 'many', label: 'reviews' },
+      forward: { on: "reviews", has: "one", label: "author" },
+      reverse: { on: "$users", has: "many", label: "reviews" },
     },
 
     // Review <-> Listing (many-to-one)
     reviewListing: {
-      forward: { on: 'reviews', has: 'one', label: 'listing' },
-      reverse: { on: 'listings', has: 'many', label: 'reviews' },
+      forward: { on: "reviews", has: "one", label: "listing" },
+      reverse: { on: "listings", has: "many", label: "reviews" },
     },
 
     // Review <-> Booking (one-to-one)
     reviewBooking: {
-      forward: { on: 'reviews', has: 'one', label: 'booking' },
-      reverse: { on: 'bookings', has: 'one', label: 'review' },
+      forward: { on: "reviews", has: "one", label: "booking" },
+      reverse: { on: "bookings", has: "one", label: "review" },
     },
 
     // Wishlist <-> User (many-to-one)
     wishlistUser: {
-      forward: { on: 'wishlist', has: 'one', label: '$user' },
-      reverse: { on: '$users', has: 'many', label: 'wishlistItems' },
+      forward: { on: "wishlist", has: "one", label: "$user" },
+      reverse: { on: "$users", has: "many", label: "wishlistItems" },
     },
 
     // Wishlist <-> Listing (many-to-one)
     wishlistListing: {
-      forward: { on: 'wishlist', has: 'one', label: 'listing' },
-      reverse: { on: 'listings', has: 'many', label: 'wishlistEntries' },
+      forward: { on: "wishlist", has: "one", label: "listing" },
+      reverse: { on: "listings", has: "many", label: "wishlistEntries" },
     },
   },
 });
@@ -184,4 +195,16 @@ interface AppSchema extends _AppSchema {}
 const schema: AppSchema = _schema;
 
 export type { AppSchema };
-export default schema; 
+export { schema };
+
+if (!process.env.EXPO_PUBLIC_INSTANT_APP_ID) {
+  throw new Error("Missing EXPO_PUBLIC_INSTANT_APP_ID environment variable");
+}
+
+// Initialize InstantDB with the app ID
+export const db = init({
+  appId: process.env.EXPO_PUBLIC_INSTANT_APP_ID,
+  schema,
+});
+
+export default db;
