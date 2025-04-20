@@ -1,0 +1,18 @@
+# Task ID: 4
+# Title: Implement Wishlist Data Fetching
+# Status: done
+# Dependencies: 3
+# Priority: high
+# Description: Create a function or hook to fetch the user's wishlist data from the database.
+# Details:
+In lib/wishlist.ts:
+1. Implement getWishlist function that fetches wishlist items with their associated listing details
+2. Follow InstantDB conventions for data fetching
+3. Ensure the returned data conforms to WishlistItemWithListing[] type
+4. Handle authentication to only fetch the current user's wishlist
+5. Implement proper error handling
+6. Consider adding loading state management
+7. Return appropriate loading, error, and data states
+
+# Test Strategy:
+Test the function with mock data and verify it returns the correct data structure. Test error scenarios to ensure proper error handling.

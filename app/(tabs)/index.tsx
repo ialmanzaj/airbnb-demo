@@ -6,8 +6,8 @@ import { Sliders } from 'lucide-react-native';
 import { LegendList } from '@legendapp/list';
 
 import Colors from '@/constants/colors';
-import SearchBar from '@/components/home/SearchBar';
-import FilterBar from '@/components/home/FilterBar';
+import SearchBar from '@/components/common/SearchBar';
+import FilterBar from '@/components/common/FilterBar';
 import PropertyCard from '@/components/home/PropertyCard';
 import { Property } from '@/types/listing';
 import { useListings } from '@/hooks/useListings';

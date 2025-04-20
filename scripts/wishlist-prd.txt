@@ -1,0 +1,91 @@
+<context>
+# Overview
+This document outlines the requirements for the Wishlist feature in the Airbnb Clone application. The Wishlist allows logged-in users to save listings they are interested in for later review. It provides a dedicated space within the app (the "Wishlist" tab) to view and manage these saved listings. This feature aims to increase user engagement and make it easier for users to track properties they like across browsing sessions.
+
+# Core Features
+- **Display Wishlist Items:** Show all listings saved by the current user in a visually appealing grid format on the dedicated Wishlist screen (`app/(tabs)/wishlist.tsx`).
+- **Wishlist Item Card:** Each item in the grid will be represented by a `WishlistItemCard` (`components/wishlist/WishlistItemCard.tsx`), displaying the listing's primary image, title, location (city, state), base price per night, and average rating.
+- **Navigation to Listing:** Tapping on a wishlist item card navigates the user to the full details screen for that specific listing.
+- **Remove from Wishlist:** Each item card includes a "favorite" (heart) button. Tapping this button when the item is already in the wishlist should remove it immediately from the list and the underlying data store.
+- **Empty State:** If the user has not saved any listings, the Wishlist screen displays a user-friendly message encouraging them to add items (`components/common/EmptyState.tsx`).
+- **Loading State:** Display an activity indicator while the wishlist data is being fetched.
+- **Error State:** If fetching the wishlist data fails, display an appropriate error message.
+
+# User Experience
+- **User Persona:** Primarily targets users browsing listings who want an easy way to save properties they find interesting without booking immediately.
+- **Key User Flow:**
+    1. User navigates to the "Wishlist" tab.
+    2. If loading, a loading indicator is shown.
+    3. If an error occurs, an error message is shown.
+    4. If the wishlist is empty, an empty state message is shown.
+    5. If the wishlist has items, they are displayed in a 2-column grid.
+    6. User can scroll vertically through their saved listings.
+    7. User taps on a listing card to navigate to the listing details screen.
+    8. User taps the heart icon on a card to remove the listing from their wishlist. The list updates immediately.
+- **UI/UX Considerations:**
+    - Utilize `LegendList` from `@legendapp/list` for efficient rendering of the grid ([`2002-legend-list.mdc`](mdc:.cursor/rules/2002-legend-list.mdc)).
+    - Ensure `WishlistItemCard` is well-styled and responsive using Tailwind CSS (`nativewind`) as per [`2001-tailwind-styling.mdc`](mdc:.cursor/rules/2001-tailwind-styling.mdc).
+    - Provide clear visual feedback for loading, empty, and error states.
+    - Removal action should feel instantaneous (optimistic update if feasible, followed by actual removal).
+</context>
+<PRD>
+# Technical Architecture
+- **Screen:** `app/(tabs)/wishlist.tsx` - Main container screen for the feature, built with React Native and Expo Router.
+- **Primary Component:** `LegendList` - Used for rendering the scrollable grid of wishlist items.
+- **Item Component:** `components/wishlist/WishlistItemCard.tsx` - Renders individual wishlist items. Requires fixing existing linter errors related to props and imports.
+- **Supporting Components:**
+    - `components/common/EmptyState.tsx` - For the empty list scenario.
+    - `components/wishlist/WishlistFavoriteButton.tsx` - Handles the add/remove action display and interaction within the card.
+    - `components/common/PriceDisplay.tsx` - Displays the price (Needs fixing import error in `WishlistItemCard`).
+    - `components/common/Rating.tsx` - Displays the rating stars (Needs fixing prop error in `WishlistItemCard`).
+    - `Image` from `expo-image` for optimized image loading.
+    - Standard React Native components (`View`, `Text`, `ActivityIndicator`, `Pressable`).
+    - `SafeAreaView` from `react-native-safe-area-context`.
+- **Data Fetching:** Utilize a dedicated hook or function (e.g., `getWishlist` from `lib/wishlist.ts`) to retrieve the user's wishlist data. This function should interact with the backend/database (presumably InstantDB, follow [`2000-instant-db.mdc`](mdc:.cursor/rules/2000-instant-db.mdc)). The fetched data must conform to the `WishlistItemWithListing` type (`types/wishlist.ts`), including necessary `Listing` details (`types/listing.ts`).
+- **Data Mutation:** Implement a function (e.g., `removeWishlistItem` in `lib/wishlist.ts`) to handle the removal of an item from the wishlist in the backend/database.
+- **State Management:** Local state within `wishlist.tsx` for loading, error status. The list data itself comes from the data fetching hook/function.
+- **Styling:** Apply styles using Tailwind CSS classes via `nativewind`, adhering to project conventions ([`2001-tailwind-styling.mdc`](mdc:.cursor/rules/2001-tailwind-styling.mdc)). Use `StyleSheet.create` only where required by component props (like `LegendList`'s `contentContainerStyle`).
+- **Navigation:** Use `useRouter` from `expo-router` for navigating to the listing detail screen (`/listing/[id]` or `/listing/[slug]`).
+- **Types:** Ensure strong typing using TypeScript, leveraging existing types in `types/` directory. Fix type errors identified by the linter in `wishlist.tsx`.
+
+# Development Roadmap
+- **MVP:**
+    1.  **Fix Component Errors:** Resolve linter errors in `components/wishlist/WishlistItemCard.tsx` (imports, props) and `app/(tabs)/wishlist.tsx` (imports, type mismatches).
+    2.  **Implement Data Fetching:** Ensure `getWishlist` fetches the required data structure (`WishlistItemWithListing[]`) correctly.
+    3.  **Implement Removal Logic:** Create and integrate the `removeWishlistItem` function, triggered by the `onRemovePress` callback from `WishlistItemCard`.
+    4.  **Render List:** Connect the fetched data to `LegendList` in `wishlist.tsx`, ensuring correct props (`estimatedItemSize`, `keyExtractor`, `numColumns`, `renderItem` using the fixed `WishlistItemCard`).
+    5.  **Implement States:** Ensure loading, error, and empty states are correctly displayed based on the data fetching status and results.
+    6.  **Implement Navigation:** Verify that tapping a card navigates correctly to the listing detail page.
+- **Future Enhancements:**
+    - Real-time updates (list automatically updates if changes occur elsewhere).
+    - Ability to create multiple named wishlists (e.g., "Summer Trip", "Weekend Getaways").
+    - Offline access to cached wishlist.
+    - Sorting/filtering options within the wishlist.
+
+# Logical Dependency Chain
+1.  Database schema for `Wishlist` and `Listing` entities must be defined and stable.
+2.  Backend functions/API endpoints for fetching (`getWishlist`) and removing (`removeWishlistItem`) wishlist items must be implemented and tested.
+3.  Core components (`WishlistItemCard`, `PriceDisplay`, `Rating`) must be functional and error-free.
+4.  Data types (`WishlistItemWithListing`, `ListingWithDetails`, `PropertyImage`, etc.) must be accurately defined in `types/`.
+5.  `wishlist.tsx` screen implementation, integrating data fetching, list rendering, state handling, and removal logic.
+
+# Risks and Mitigations
+- **Component Errors:** Existing linter errors in `WishlistItemCard` and `wishlist.tsx` block progress. **Mitigation:** Prioritize fixing these errors before implementing new logic.
+- **Data Type Mismatches:** The data returned by `getWishlist` might not perfectly match the expected `WishlistItemWithListing[]` or the props expected by `WishlistItemCard`. **Mitigation:** Add runtime checks or use Zod for validation during development; ensure type definitions in `types/` are accurate and comprehensive. Review data structure from `getWishlist` carefully.
+- **Performance with Large Lists:** Fetching/rendering hundreds of wishlist items could be slow. **Mitigation:** `LegendList` handles rendering performance. Ensure backend query (`getWishlist`) is efficient. Implement pagination in the data fetching layer if necessary.
+- **State Management for Removal:** Ensuring the list updates correctly and immediately after removal. **Mitigation:** Use the state management pattern from the data fetching hook (e.g., refetching or locally mutating the cached data) to ensure UI consistency.
+
+# Appendix
+- **Relevant Files:**
+    - `app/(tabs)/wishlist.tsx`
+    - `components/wishlist/WishlistItemCard.tsx`
+    - `lib/wishlist.ts`
+    - `types/wishlist.ts`
+    - `types/listing.ts`
+- **Relevant Rules:**
+    - [`2002-legend-list.mdc`](mdc:.cursor/rules/2002-legend-list.mdc)
+    - [`2001-tailwind-styling.mdc`](mdc:.cursor/rules/2001-tailwind-styling.mdc)
+    - [`2000-instant-db.mdc`](mdc:.cursor/rules/2000-instant-db.mdc)
+    - [`1001-import-paths.mdc`](mdc:.cursor/rules/1001-import-paths.mdc)
+    - [`2003-types-from-schema.mdc`](mdc:.cursor/rules/2003-types-from-schema.mdc)
+</PRD> 

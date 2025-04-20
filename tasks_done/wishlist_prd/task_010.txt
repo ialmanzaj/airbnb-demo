@@ -1,0 +1,17 @@
+# Task ID: 10
+# Title: Implement Navigation to Listing Details
+# Status: done
+# Dependencies: 1, 9
+# Priority: medium
+# Description: Implement navigation from wishlist items to the listing details screen.
+# Details:
+In app/(tabs)/wishlist.tsx and components/wishlist/WishlistItemCard.tsx:
+1. Import useRouter from expo-router
+2. Implement onPress handler for WishlistItemCard
+3. Use router.push to navigate to the listing detail screen (/listing/[id] or /listing/[slug])
+4. Pass the correct listing ID or slug as a parameter
+5. Ensure the navigation works correctly and preserves state
+6. Add appropriate visual feedback for the pressed state
+
+# Test Strategy:
+Manually test navigation by tapping on wishlist items and verifying that it navigates to the correct listing details screen. Test with various listing IDs to ensure the navigation works correctly.

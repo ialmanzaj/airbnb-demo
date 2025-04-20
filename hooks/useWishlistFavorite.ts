@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useWishlistEntryId, toggleWishlist } from '@/lib/wishlist';
+import { getWishlistByListingId, toggleWishlist } from '@/lib/wishlist';
 
 export interface UseWishlistFavoriteResult {
   isFavorite: boolean;
@@ -9,7 +9,7 @@ export interface UseWishlistFavoriteResult {
 }
 
 export const useWishlistFavorite = (propertyId: string): UseWishlistFavoriteResult => {
-  const { data, isLoading, error } = useWishlistEntryId(propertyId);
+  const { data, isLoading, error } = getWishlistByListingId(propertyId);
   const wishlistId = data?.wishlist?.[0]?.id;
   
   const handleToggle = useCallback(async () => {

@@ -36,6 +36,7 @@ Guidelines for building user interfaces and handling frontend logic.
 | [2001-component-design.mdc](mdc:.cursor/rules/2001-component-design.mdc) | Guidelines for designing React components.                  |
 | [2001-tailwind-styling.mdc](mdc:.cursor/rules/2001-tailwind-styling.mdc) | Rules and conventions for using Tailwind CSS.             |
 
+
 ## Backend & Data
 
 Guidelines for implementing backend logic, APIs, and data persistence.
@@ -43,6 +44,7 @@ Guidelines for implementing backend logic, APIs, and data persistence.
 | Rule File                          | Description                                                 |
 | :--------------------------------- | :---------------------------------------------------------- |
 | [2000-instant-db.mdc](mdc:.cursor/rules/2000-instant-db.mdc) | Guidelines for working with InstantDB.                     |
+| [2003-types-from-schema.mdc](mdc:.cursor/rules/2003-types-from-schema.mdc) | Guidelines for creating TypeScript types from InstantDB schema. |
 
 ## Mobile (Expo)
 
@@ -51,6 +53,7 @@ Guidelines specific to developing with the Expo framework.
 | Rule File                          | Description                                                 |
 | :--------------------------------- | :---------------------------------------------------------- |
 | [2000-expo.mdc](mdc:.cursor/rules/2000-expo.mdc)       | Guidelines for developing with Expo.                       |
+| [2000-expo-router.mdc](mdc:.cursor/rules/2000-expo-router.mdc) | Define navigation standards for Expo Router to ensure code quality and maintainability. |
 
 ## Testing
 

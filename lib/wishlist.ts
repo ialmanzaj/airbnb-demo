@@ -40,7 +40,7 @@ export async function addToWishlist(
  * @param listingId The ID of the listing to check
  * @returns Query result containing wishlist entry ID if it exists
  */
-export function useWishlistEntryId(listingId: string) {
+export function getWishlistByListingId(listingId: string) {
   return db.useQuery({
     wishlist: {
       $: {
@@ -82,23 +82,37 @@ export async function removeFromWishlist(
  * @returns boolean indicating if the listing is in the wishlist
  */
 export function useWishlistExists(listingId: string): boolean {
-  const { data } = useWishlistEntryId(listingId);
+  const { data } = getWishlistByListingId(listingId);
   return Boolean(data?.wishlist?.length);
 }
 
 /**
- * Hook to get all wishlist entries for the current user
- * @returns Array of wishlist entries with listing details
+ * Hook to get all wishlist entries for the current user with detailed listing information
+ * @returns Array of wishlist entries with nested listing details (location, pricing, primary image)
  */
-export function useWishlist() {
+export function getWishlist() {
+  // Fetch wishlist items and include necessary linked listing details
+  // This query structure should align with ListingWithDetails type
   const { data, isLoading, error } = db.useQuery({
     wishlist: {
-      listing: {},
+      listing: { // Fetch the linked listing
+        // Explicitly fetch nested fields needed for the UI
+        location: {}, // Fetch linked location details
+        pricing: {}, // Fetch linked pricing details
+        images: { // Fetch linked images
+           // Optionally filter for primary image or limit, but fetching all 
+           // might be needed by WishlistItemCard's findPrimaryImageUrl
+           // $: { where: { isPrimary: true }, limit: 1 }, 
+        }, 
+      },
     },
   });
 
+  // Ensure we return an empty array if data is null/undefined during loading or error
+  const wishlistItems = data?.wishlist || [];
+
   return {
-    wishlist: data?.wishlist || [],
+    wishlist: wishlistItems,
     isLoading,
     error,
   };

@@ -1,5 +1,5 @@
 import React from 'react';
-import SearchBar from '@/components/home/SearchBar';
+import SearchBar from '@/components/common/SearchBar';
 import { fireEvent } from '@testing-library/react-native';
 import { render } from '../utils/test-utils';
 

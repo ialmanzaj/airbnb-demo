@@ -1,0 +1,18 @@
+# Task ID: 5
+# Title: Implement Wishlist Item Removal
+# Status: done
+# Dependencies: 3, 4
+# Priority: high
+# Description: Create a function to remove an item from the user's wishlist.
+# Details:
+In lib/wishlist.ts:
+1. Implement removeWishlistItem function that removes an item from the wishlist
+2. Follow InstantDB conventions for data mutation
+3. Accept wishlist item ID as parameter
+4. Implement proper error handling
+5. Return success/failure status
+6. Consider implementing optimistic updates for better UX
+7. Ensure the function triggers appropriate refetching or state updates
+
+# Test Strategy:
+Test the function with mock data to verify it correctly removes items. Test error scenarios to ensure proper error handling. Verify that the UI updates correctly after removal.

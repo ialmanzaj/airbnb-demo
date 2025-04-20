@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFiltersStore } from '@/store/filters';
-import SearchBar from './SearchBar';
+import SearchBar from '../common/SearchBar';
 
 const SearchBarContainer = () => {
   const { searchQuery, setSearchQuery } = useFiltersStore();

@@ -1,0 +1,17 @@
+# Task ID: 8
+# Title: Implement Wishlist Screen UI States
+# Status: done
+# Dependencies: 2, 4, 7
+# Priority: medium
+# Description: Implement loading, error, and empty states for the wishlist screen.
+# Details:
+In app/(tabs)/wishlist.tsx:
+1. Implement loading state using ActivityIndicator
+2. Implement error state with appropriate error message
+3. Integrate the EmptyState component for when the wishlist is empty
+4. Ensure proper conditional rendering based on data fetching status
+5. Add appropriate styling using Tailwind CSS
+6. Ensure all states are accessible and user-friendly
+
+# Test Strategy:
+Test each state by manipulating the data fetching results. Verify that the correct state is displayed based on the data fetching status.

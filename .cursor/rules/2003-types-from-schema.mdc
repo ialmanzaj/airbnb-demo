@@ -1,0 +1,87 @@
+----
+description: Define TypeScript types from InstantDB schema to ensure code quality and maintainability.
+globs: *.tsx,*.ts
+alwaysApply: false
+----
+# TypeScript Type Generation from InstantDB Schema
+
+## Context
+- When creating or updating TypeScript type definitions for data entities.
+- When ensuring type safety for data fetched from or sent to InstantDB.
+- When working with files in the `types/` directory.
+
+## Requirements
+- **Primary Source of Truth:** All entity and link-based types MUST be derived directly from the schema defined in [`lib/db.ts`](mdc:lib/db.ts).
+- **Entity Mapping:** Each entity defined in the `schema.entities` section of `lib/db.ts` should have a corresponding TypeScript interface.
+  - Map InstantDB types (e.g., `i.string()`, `i.number()`, `i.boolean()`, `i.date()`, `i.json()`) to their corresponding TypeScript types (`string`, `number`, `boolean`, `string` or `Date`, `any` or a specific interface).
+- **Link Mapping:** Consider relationships defined in `schema.links` when creating types that represent combined data (e.g., a wishlist item including its associated listing).
+- **Naming Conventions:** Use PascalCase for interface names (e.g., `UserProfile`, `ListingData`).
+- **Synchronization:** Keep TypeScript types synchronized with any changes made to the `lib/db.ts` schema. If the schema is updated, the corresponding types MUST be updated.
+- **Location:** Place base entity types within the `types/` directory (e.g., `types/listing.ts`, `types/user.ts`).
+- **Clarity:** Use comments to indicate the origin or purpose of specific types, especially complex or combined ones.
+
+## Examples
+
+<example>
+```typescript
+// types/listing.ts
+// Based on schema.entities.listings in lib/db.ts
+
+export interface Listing {
+  id: string; // Implicit ID from InstantDB
+  title: string;
+  description: string;
+  type: string; 
+  slug: string; 
+  status: string; 
+  maxGuests: number;
+  bedrooms: number;
+  beds: number;
+  baths: number;
+  rating: number;
+  createdAt: string; // Or Date, depending on usage
+  updatedAt: string; // Or Date
+  // Add linked entity IDs if needed for specific queries/mutations
+  hostId: string; 
+  locationId: string;
+  pricingId: string;
+}
+
+// Potentially add types for related entities if not defined separately
+// export interface Location { ... } 
+// export interface Pricing { ... }
+```
+</example>
+
+<example>
+```typescript
+// types/wishlist.ts
+// Based on schema.entities.wishlist and schema.links.wishlistListing
+
+import type { Listing } from './listing'; 
+
+// Base entity type
+export interface Wishlist {
+  id: string;
+  createdAt: string; // Or Date?
+  status: string; 
+  userId: string; // From wishlistUser link
+  listingId: string; // From wishlistListing link
+}
+
+// Combined type representing a wishlist item WITH its listing data
+// Useful for hooks or components displaying wishlist details
+export interface WishlistItemWithListing extends Wishlist {
+  listing: Listing | null; // Reflects the 'has one' relationship
+}
+```
+</example>
+
+<critical>
+- ALWAYS refer to [`lib/db.ts`](mdc:lib/db.ts) when defining or updating data types.
+- ENSURE TypeScript types accurately reflect the fields and relationships defined in the schema.
+- UPDATE types immediately if the schema changes.
+- USE specific types from InstantDB (`AppSchema`) directly when interacting with `db` hooks/functions if appropriate, but define standalone types for component props and return values.
+</critical>
+
+<version>1.0.0</version> 

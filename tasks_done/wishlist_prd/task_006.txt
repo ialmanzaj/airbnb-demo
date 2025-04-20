@@ -1,0 +1,17 @@
+# Task ID: 6
+# Title: Implement WishlistFavoriteButton Component
+# Status: done
+# Dependencies: 5
+# Priority: medium
+# Description: Create a reusable button component for adding/removing items from the wishlist.
+# Details:
+In components/wishlist/WishlistFavoriteButton.tsx:
+1. Create a component that displays a heart icon
+2. Implement toggling between filled and outlined heart based on wishlist status
+3. Connect the removeWishlistItem function to the button's onPress handler
+4. Add appropriate styling using Tailwind CSS
+5. Include visual feedback for the pressed state
+6. Ensure the component is accessible
+
+# Test Strategy:
+Manually test the component to verify it correctly displays the heart icon and responds to presses. Verify that it correctly calls the removeWishlistItem function when pressed.

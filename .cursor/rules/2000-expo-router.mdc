@@ -1,0 +1,102 @@
+----
+description: Define navigation standards for Expo Router to ensure code quality and maintainability.
+globs: *.tsx,*.ts
+alwaysApply: false
+----
+
+# Expo Router Navigation Standards
+
+## Context
+
+- This rule applies to all navigation logic implemented using Expo Router within the `app/` directory.
+- Ensures consistency in defining routes, layouts, and handling navigation actions.
+- Refer to the official [Expo Router documentation](https://docs.expo.dev/router/introduction/) for detailed API usage.
+
+## Requirements
+
+- **Layout Routes (`_layout.tsx`):**
+    - Use `_layout.tsx` files to define shared UI elements and structure for segments.
+    - Place top-level layout configuration (e.g., `Stack`, `Tabs`) in `app/_layout.tsx`.
+    - Nested layouts (e.g., `app/(tabs)/_layout.tsx`) should configure the navigation specific to that group (e.g., `Tabs` component).
+- **Screen Components:**
+    - Each file in `app/` (excluding `_layout.tsx` and special files like `+not-found.tsx`) represents a screen/route.
+    - Screen components should default export a React component.
+    - Keep screen components focused on presentation and navigation logic relevant to that screen. Fetching and business logic should often reside in hooks or utilities.
+- **Route Groups:**
+    - Use parentheses `()` for organizing routes without affecting the URL path (e.g., `app/(tabs)/index.tsx`).
+    - Use route groups primarily for applying specific layouts (`_layout.tsx`) to a set of screens (like tab bars).
+- **Navigation Methods:**
+    - Prefer the typed `Link` component for static navigation between screens where possible.
+    - Use the `useRouter` hook (`router.push`, `router.replace`, `router.back`) for imperative navigation (e.g., after form submission, button press).
+    - Use `router.push` for adding a new screen to the stack.
+    - Use `router.replace` when the current screen shouldn't be added to the history stack (e.g., navigating away from an auth screen after login).
+- **Parameter Handling:**
+    - Define dynamic routes using square brackets `[]` (e.g., `app/listing/[id].tsx`).
+    - Access route parameters using the `useLocalSearchParams` hook.
+    - Consider adding type safety for search parameters using libraries or manual validation.
+- **Not Found Route:**
+    - Implement a `app/+not-found.tsx` screen to handle unmatched routes gracefully.
+
+## Examples
+
+<example>
+// Good: Using Link for static navigation
+import { Link } from 'expo-router';
+import { Text } from 'react-native';
+
+export default function HomeScreen() {
+  return (
+    <Link href="/profile">
+      <Text>View Profile</Text>
+    </Link>
+  );
+}
+</example>
+
+<example>
+// Good: Using router.push for imperative navigation
+import { useRouter } from 'expo-router';
+import { Button } from 'react-native';
+
+export default function CreatePostScreen() {
+  const router = useRouter();
+
+  const handleCreate = () => {
+    // ... create post logic ...
+    router.push('/posts');
+  };
+
+  return <Button title="Create Post" onPress={handleCreate} />;
+}
+</example>
+
+<example>
+// Good: Accessing search params
+import { useLocalSearchParams } from 'expo-router';
+import { Text } from 'react-native';
+
+export default function ListingDetailScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>(); // Consider adding type safety
+
+  return <Text>Showing details for listing: {id}</Text>;
+}
+</example>
+
+<example type="invalid">
+// Bad: Using router.push for navigating back (use router.back())
+import { useRouter } from 'expo-router';
+import { Button } from 'react-native';
+
+export default function SettingsScreen() {
+  const router = useRouter();
+
+  const handleGoBack = () => {
+    // Should use router.back() instead
+    router.push('/'); 
+  };
+
+  return <Button title="Back to Home" onPress={handleGoBack} />;
+}
+</example> 
+
+<version>1.0.0</version>

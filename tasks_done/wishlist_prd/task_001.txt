@@ -1,0 +1,16 @@
+# Task ID: 1
+# Title: Fix Component Errors in WishlistItemCard
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Resolve linter errors in the WishlistItemCard component related to imports and props.
+# Details:
+Fix the following issues in components/wishlist/WishlistItemCard.tsx:
+1. Correct import paths for PriceDisplay and Rating components
+2. Ensure props match the expected types
+3. Verify all required props are being passed correctly
+4. Fix any TypeScript errors related to the component props
+5. Ensure the component adheres to the Tailwind CSS styling conventions
+
+# Test Strategy:
+Verify that all linter errors are resolved by running the linter. Manually test the component by rendering it with mock data to ensure it displays correctly.

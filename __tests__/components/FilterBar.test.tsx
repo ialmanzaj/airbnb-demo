@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import FilterBar from '@/components/home/FilterBar';
+import FilterBar from '@/components/common/FilterBar';
 import Colors from '@/constants/colors';
 
 // Mock colors constant

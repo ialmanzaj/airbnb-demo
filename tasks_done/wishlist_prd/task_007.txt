@@ -1,0 +1,16 @@
+# Task ID: 7
+# Title: Implement Empty State Component
+# Status: done
+# Dependencies: None
+# Priority: medium
+# Description: Create or update the EmptyState component for displaying when the wishlist is empty.
+# Details:
+In components/common/EmptyState.tsx:
+1. Create or update the component to display a user-friendly message
+2. Add appropriate styling using Tailwind CSS
+3. Include an illustration or icon to enhance visual appeal
+4. Make the component reusable by accepting customizable message props
+5. Ensure the component is responsive and accessible
+
+# Test Strategy:
+Manually test the component to verify it displays correctly with different messages and on different screen sizes.

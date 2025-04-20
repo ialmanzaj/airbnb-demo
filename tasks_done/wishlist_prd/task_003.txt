@@ -1,0 +1,16 @@
+# Task ID: 3
+# Title: Implement Wishlist Data Types
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Define or update the necessary TypeScript types for wishlist functionality.
+# Details:
+In types/wishlist.ts and types/listing.ts:
+1. Define or update the WishlistItemWithListing type that combines wishlist and listing data
+2. Ensure types are compatible with the database schema
+3. Include all required fields for the WishlistItemCard (image, title, location, price, rating)
+4. Define any additional types needed for the wishlist functionality
+5. Follow the types-from-schema convention if applicable
+
+# Test Strategy:
+Verify types are correctly defined by using them in sample code. Ensure they match the expected database schema and component requirements.
