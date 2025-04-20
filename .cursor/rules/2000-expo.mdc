@@ -1,5 +1,5 @@
 ---
-description: 
+description: Define development standards for React Native applications using Expo to ensure code quality and maintainability.
 globs: *.tsx,*.ts
 alwaysApply: false
 ---

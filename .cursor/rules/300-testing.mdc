@@ -1,17 +1,20 @@
 ---
-description: 
-globs: *.tsx,*.ts
+description: Define testing standards for React Native projects using Jest and Maestro to ensure code quality and maintainability.
+globs: __tests__/**/*.{ts,tsx},*.maestro,*.yaml,__mocks__/**/*
 alwaysApply: false
 ---
 
 # React Native Testing Standards
 
 ## Test Organization
-- Co-locate test files with source using `.test.{ts,tsx}` extension
-- Place E2E tests in `e2e/` directory using `.spec.{ts,tsx}`
-- Store test utilities in `__tests__/utils/`
-- Organize mock data in `__mocks__/` by feature
-- Maintain minimum 80% code coverage
+- Locate unit and integration test files within the central `__tests__/` directory. Use the `.test.{ts,tsx}` extension.
+  - Place component tests in `__tests__/components/`.
+  - Place hook tests in `__tests__/hooks/`.
+  - Store common test utilities and helpers in `__tests__/utils/`.
+  - Configure global test setup (e.g., mocks, environment) in `__tests__/setup.ts`.
+- Place E2E tests in the root `.maestro/` directory using `.maestro` files (or `.yaml` if preferred).
+- Organize mock data files within a root `__mocks__/` directory, potentially subdivided by feature.
+- Maintain minimum 80% code coverage across all test types.
 
 ## Testing Types and Examples
 
@@ -24,13 +27,17 @@ describe('Button', () => {
   const setup = (props = {}) => render(<Button label="Click me" {...props} />);
 
   it('renders and handles interactions', () => {
+    // Arrange
     const onPress = jest.fn();
     const { getByText } = setup({ onPress });
     
     const button = getByText('Click me');
     expect(button).toBeTruthy();
-    
+
+    // Act
     fireEvent.press(button);
+
+    // Assert
     expect(onPress).toHaveBeenCalled();
   });
 
@@ -46,15 +53,18 @@ describe('useDataFetching', () => {
   afterEach(() => jest.useRealTimers());
 
   it('manages data lifecycle', async () => {
+    // Arrange
     const { result } = renderHook(() => useDataFetching());
 
-    expect(result.current.loading).toBe(true);
+    expect(result.current.loading).toBe(true); // Initial assert/check
 
+    // Act
     await act(async () => {
       await result.current.fetchData();
       jest.runAllTimers();
     });
 
+    // Assert
     expect(result.current.data).toBeDefined();
     expect(result.current.loading).toBe(false);
   });
@@ -114,7 +124,7 @@ Key Points:
 - Test error scenarios
 - Validate state management
 
-### E2E Testing
+### E2E Testing (Maestro)
 ```yaml
 # login_flow.spec.yaml
 appId: com.myapp
@@ -142,6 +152,19 @@ Key Points:
 - Check data persistence
 - Validate navigation
 - Test real API integration
+
+### Snapshot Testing
+- Use snapshot tests sparingly, primarily for verifying the structure of static UI components.
+- Avoid snapshots for components with complex logic or frequently changing content.
+- Always review snapshot changes carefully before committing. Ensure changes are intentional and correct.
+- Consider visual regression testing as an alternative for complex UI verification.
+
+### Mocking Dependencies
+- Use `jest.mock()` for mocking modules, especially third-party libraries or native modules.
+- Place manual mocks for complex modules within the `__mocks__/` directory.
+- Mock external API calls using tools like `msw` (Mock Service Worker) or `jest.spyOn(global, 'fetch')`.
+- Ensure mocks accurately reflect the expected API contracts.
+- Commonly mocked modules: `react-native-permissions`, `@react-native-async-storage/async-storage`, `@react-navigation/*`.
 
 ## Best Practices
 
@@ -173,6 +196,10 @@ describe('ComponentName', () => {
   });
 });
 ```
+
+### Test Naming Conventions
+- `describe` blocks should name the component, hook, or flow being tested (e.g., `describe('UserProfile')`).
+- `it` blocks should clearly state the expected behavior or condition being tested (e.g., `it('should display an error message on failed login')`, `it('renders correctly when loading')`).
 
 ### Common Patterns
 - Use data-testid for queries: `{component}-{element}-{state}`

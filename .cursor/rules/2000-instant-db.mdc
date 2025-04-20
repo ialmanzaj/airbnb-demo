@@ -1,5 +1,5 @@
 ----
-description: 
+description: Define CRUD operation patterns for InstantDB to ensure code quality and maintainability.
 globs: *.tsx,*.ts
 alwaysApply: false
 ----

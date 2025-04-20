@@ -1,5 +1,5 @@
 ---
-description: 
+description: Define implementation standards for LegendList to ensure code quality and maintainability.
 globs: *.tsx
 alwaysApply: false
 ---

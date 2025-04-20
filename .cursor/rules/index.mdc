@@ -1,5 +1,5 @@
 ---
-description: 
+description: Index of all active Cursor rules within this repository, organized by category.
 globs: 
 alwaysApply: true
 ---
@@ -58,7 +58,7 @@ Guidelines for application testing strategies and implementation.
 
 | Rule File                          | Description                                                 |
 | :--------------------------------- | :---------------------------------------------------------- |
-| [300-airbnb-testing.mdc](mdc:.cursor/rules/300-airbnb-testing.mdc) | Testing guidelines (possibly following Airbnb style).      |
+| [300-testing.mdc](mdc:.cursor/rules/300-testing.mdc) | Testing guidelines.      |
 
 ## Improvement & Maintenance
 

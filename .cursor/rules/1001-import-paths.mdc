@@ -1,5 +1,5 @@
 ----
-description: 
+description: Define import path standards for React Native projects to ensure code quality and maintainability.
 globs: *.tsx,*.ts
 alwaysApply: false
 ----

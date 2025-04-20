@@ -1,5 +1,5 @@
 ---
-description: 
+description: Define component design best practices for React Native projects to ensure code quality and maintainability.
 globs: *.tsx,*.ts
 alwaysApply: false
 ---
