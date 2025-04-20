@@ -1,0 +1,42 @@
+# Project Tech Stack
+
+This document outlines the primary technologies, libraries, and frameworks used in this project.
+
+## Core Framework & Runtime
+
+*   **Runtime:** [Bun](https://bun.sh/) (indicated by `bun.lock`) - Used for package management and potentially as the JavaScript runtime.
+*   **Framework:** [Expo](https://expo.dev/) / [React Native](https://reactnative.dev/) - The foundation for building the cross-platform mobile application.
+*   **Language:** [TypeScript](https://www.typescriptlang.org/) - Used for static typing, improving code quality and maintainability.
+
+## Frontend & UI
+
+*   **Navigation:** [Expo Router](https://docs.expo.dev/router/introduction/) - File-based routing built on top of React Navigation.
+*   **Styling:** [Tailwind CSS](https://tailwindcss.com/) via [NativeWind v4](https://www.nativewind.dev/) - Utility-first CSS framework for styling React Native components.
+*   **State Management:** [Zustand](https://github.com/pmndrs/zustand) - A small, fast, and scalable state management solution.
+*   **UI Components:**
+    *   Standard React Native components.
+    *   [@legendapp/list](https://legendapp.com/dev/state/react-native/list/) - Used for performant lists.
+    *   Custom components located in the `components/` directory.
+*   **Icons:**
+    *   [@expo/vector-icons](https://docs.expo.dev/guides/icons/) - Provides access to several icon sets.
+    *   [Lucide React Native](https://lucide.dev/) - Simple and consistent icon toolkit.
+*   **Animations:** [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/) - Library for creating smooth animations and interactions.
+*   **Gestures:** [React Native Gesture Handler](https://docs.swmansion.com/react-native-gesture-handler/) - Provides native-driven gesture management.
+
+## Backend & Data
+
+*   **Database/Backend:** [InstantDB](https://instantdb.com/) (`@instantdb/react-native`) - Realtime database and backend solution.
+
+## Testing
+
+*   **Framework:** [Jest](https://jestjs.io/) - JavaScript testing framework.
+*   **E2E Testing:** [Maestro](https://maestro.mobile.dev/) - Tool for writing and running simple, reliable end-to-end tests for mobile apps.
+*   **Utilities:**
+    *   [React Native Testing Library](https://callstack.github.io/react-native-testing-library/) - Utilities for testing React Native components.
+    *   `jest-expo` - Jest preset for Expo projects.
+
+## Development Tools
+
+*   **Transpiler:** [Babel](https://babeljs.io/) - Used for transpiling modern JavaScript and TypeScript.
+*   **Module Bundler:** [Metro](https://metrobundler.dev/) - The default bundler for React Native/Expo.
+*   **Code Formatting:** Prettier (inferred from `prettier-plugin-tailwindcss`), potentially ESLint (though not explicitly listed in devDeps). 
