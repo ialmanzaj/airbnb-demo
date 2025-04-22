@@ -5,9 +5,7 @@ import { useRouter } from 'expo-router';
 import PriceDisplay from '@/components/PriceDisplay';
 import Rating from '@/components/home/Rating';
 import ImageCarousel from '@/components/ImageCarousel';
-import WishlistFavoriteButton from '@/components/wishlist/WishlistFavoriteButton';
 import { WishlistItemWithListing } from '@/types/wishlist';
-import { PropertyImage } from '@/types/listing';
 
 interface WishlistItemCardProps {
     item: WishlistItemWithListing;
@@ -21,11 +19,10 @@ export function WishlistItemCard({ item, onRemovePress }: WishlistItemCardProps)
     const router = useRouter();
     const listing = item.listing;
 
-    if (!listing) {
-        return null;
-    }
-
+    // --- Define hooks unconditionally ---
     const handleCardPress = useCallback(() => {
+        if (!listing) return; // Add internal check if listing might become null later
+
         if (listing.slug) {
             // Cast route to any to resolve expo-router type issue for dynamic routes
             router.push(`/listing/${listing.slug}` as any);
@@ -33,23 +30,12 @@ export function WishlistItemCard({ item, onRemovePress }: WishlistItemCardProps)
             router.push(`/listing/${listing.id}` as any);
             console.warn('Navigating using listing ID as slug is missing.');
         }
-    }, [router, listing.slug, listing.id]);
+    }, [router, listing?.slug, listing?.id]);
 
-    const handleRemove = useCallback(() => {
-        onRemovePress(item.id);
-    }, [onRemovePress, item.id]);
-
-    // Find primary image or fallback to the first one
-    const findPrimaryImageUrl = (images: PropertyImage[] | undefined): string => {
-        console.log('images', images);
-        if (!images || images.length === 0) {
-            return 'https://via.placeholder.com/300'; // Default placeholder
-        }
-        const primary = images.find((img) => img.isPrimary);
-        return primary?.url || images[0].url;
-    };
-
-    const primaryImageUrl = findPrimaryImageUrl(listing.images);
+    // --- Conditional return AFTER hooks ---
+    if (!listing) {
+        return null; // Or return a placeholder/loading component
+    }
 
     return (
         <Pressable onPress={handleCardPress}
@@ -61,13 +47,6 @@ export function WishlistItemCard({ item, onRemovePress }: WishlistItemCardProps)
                 images={listing.images || []}
                 height={cardWidth * 1.1}
             />
-            <View className={styles.favoriteButtonContainer}>
-                <WishlistFavoriteButton
-                    isFavorite={true}
-                    onPress={handleRemove}
-                    size={24}
-                />
-            </View>
 
             <View className={styles.infoContainer}>
                 <View className={styles.titleRow}>
