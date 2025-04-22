@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Knowledge Base
+
+This file explains the Knowledge Base feature and how it's implemented within the Airbnb Clone project.
+
+The knowledge base helps hosts store and manage reusable information related to their listings and guest interactions. It acts as a personal database of information that can be referenced when communicating with guests or managing property details.
+
+## Overview
